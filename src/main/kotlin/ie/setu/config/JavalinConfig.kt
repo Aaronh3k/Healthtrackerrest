@@ -61,7 +61,7 @@ class JavalinConfig {
         }
     }
 
-    fun getConfiguredOpenApiPlugin() = OpenApiPlugin(
+    private fun getConfiguredOpenApiPlugin() = OpenApiPlugin(
         OpenApiOptions(
             Info().apply {
                 title("Health Tracker App")
