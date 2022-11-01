@@ -25,7 +25,7 @@ class HealthTrackerControllerTest {
     inner class ReadUsers {
         @Test
         fun `get all users from the database returns 200 or 404 response`() {
-            val response = Unirest.get(origin + "/api/users/").asString()
+            val response = Unirest.get("$origin/api/users/").asString()
             if (response.status == 200) {
                 val retrievedUsers: ArrayList<User> = jsonToObject(response.body.toString())
                 assertNotEquals(0, retrievedUsers.size)
