@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import ie.setu.domain.Activity
 import ie.setu.domain.Category
+import ie.setu.domain.Goal
 import ie.setu.domain.User
 import ie.setu.domain.repository.ActivityDAO
 import ie.setu.domain.repository.UserDAO
@@ -397,4 +398,121 @@ fun updateCategoryByCategoryId(ctx: Context){
     else
         ctx.status(404)
 }
+
+//-------------------------------------------------------------
+// GoalDAOI specifics
+//-------------------------------------------------------------
+    @OpenApi(
+        summary = "Get all Goals",
+        operationId = "getAllGoals",
+        tags = ["Goal"],
+        path = "/api/goals",
+        method = HttpMethod.GET,
+        responses = [OpenApiResponse("200", [OpenApiContent(Array<User>::class)])]
+    )
+    fun getAllGoals(ctx: Context) {
+        //mapper handles the deserialization of Joda date into a String.
+        val mapper = jacksonObjectMapper()
+            .registerModule(JodaModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        ctx.json(mapper.writeValueAsString( HealthTrackerController.goalDAO.getAll() ))
+    }
+
+    @OpenApi(
+        summary = "Get goal by ID",
+        operationId = "getGoalsByGoalId",
+        tags = ["Goal"],
+        path = "/api/goals/{goal-id}",
+        method = HttpMethod.GET,
+        pathParams = [OpenApiParam("goal-id", Int::class, "The goal ID")],
+        responses  = [OpenApiResponse("200", [OpenApiContent(User::class)])]
+    )
+    fun getGoalsByGoalId(ctx: Context) {
+        val goal = HealthTrackerController.goalDAO.findByGoalId((ctx.pathParam("goal-id").toInt()))
+        if (goal != null){
+            val mapper = jacksonObjectMapper()
+                .registerModule(JodaModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            ctx.json(mapper.writeValueAsString(goal))
+        }
+    }
+
+    @OpenApi(
+        summary = "Add Goal",
+        operationId = "addGoals",
+        tags = ["Goal"],
+        path = "/api/goals",
+        method = HttpMethod.POST,
+        pathParams = [OpenApiParam("goal-id", Int::class, "The goal ID")],
+        responses  = [OpenApiResponse("200")]
+    )
+    fun addGoals(ctx: Context) {
+        //mapper handles the serialisation of Joda date into a String.
+        val mapper = jacksonObjectMapper()
+            .registerModule(JodaModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        val map = JSONObject(ctx.body()).toMap()
+        map["created_at"] = DateTime.now().toString()
+        val goal = mapper.readValue<Goal>(JSONObject(map).toString())
+        val goalId = HealthTrackerController.goalDAO.save(goal)
+        if (goalId != 0) {
+            goal.id = goalId
+            ctx.json(goal)
+            ctx.status(201)
+        }
+        else{
+            ctx.status(400)
+        }
+        ctx.json(goal)
+    }
+
+    @OpenApi(
+        summary = "Delete goal by ID",
+        operationId = "deleteGoalByGoalId",
+        tags = ["Goal"],
+        path = "/api/goals/{goal-id}",
+        method = HttpMethod.DELETE,
+        pathParams = [OpenApiParam("goal-id", Int::class, "The goal ID")],
+        responses  = [OpenApiResponse("204")]
+    )
+    fun deleteGoalByGoalId(ctx: Context){
+        HealthTrackerController.goalDAO.deleteByGoalId(ctx.pathParam("goal-id").toInt())
+    }
+
+    @OpenApi(
+        summary = "Delete goal by user ID",
+        operationId = "deleteGoalByUserId",
+        tags = ["Goal"],
+        path = "/api/goals/{goal-id}",
+        method = HttpMethod.DELETE,
+        pathParams = [OpenApiParam("goal-id", Int::class, "The goal ID")],
+        responses  = [OpenApiResponse("204")]
+    )
+    fun deleteGoalByUserId(ctx: Context){
+        HealthTrackerController.goalDAO.deleteByGoalId(ctx.pathParam("goal-id").toInt())
+    }
+
+    @OpenApi(
+        summary = "Update goal by goal ID",
+        operationId = "updateGoalByGoalId",
+        tags = ["Goal"],
+        path = "/api/goals/{goal-id}",
+        method = HttpMethod.PATCH,
+        pathParams = [OpenApiParam("goal-id", Int::class, "The goal ID")],
+        responses  = [OpenApiResponse("204")]
+    )
+    fun updateGoalByGoalId(ctx: Context){
+        val mapper = jacksonObjectMapper()
+            .registerModule(JodaModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        val map = JSONObject(ctx.body()).toMap()
+        map["created_at"] = DateTime.now().toString()
+        val goal = mapper.readValue<Goal>(JSONObject(map).toString())
+        if (goalDAO.updateByGoalId(
+                goalId = ctx.pathParam("goal-id").toInt(),
+                goalDTO = goal) != 0)
+            ctx.status(204)
+        else
+            ctx.status(404)
+    }
 }
