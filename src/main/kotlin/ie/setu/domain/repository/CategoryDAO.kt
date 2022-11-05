@@ -2,11 +2,9 @@ package ie.setu.domain.repository
 
 import ie.setu.domain.Category
 import ie.setu.domain.db.Categories
-import ie.setu.domain.db.Users
 import ie.setu.utils.mapToCategory
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.joda.time.DateTime
 
 class CategoryDAO {
 

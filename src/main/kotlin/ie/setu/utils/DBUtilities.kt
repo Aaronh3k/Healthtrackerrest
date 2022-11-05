@@ -35,11 +35,10 @@ fun mapToGoal(it: ResultRow) = Goal(
     id = it[Goals.id],
     userId = it[Goals.userId],
     calories = it[Goals.calories],
-    distance = it[Goals.distance],
     standing_hours = it[Goals.standing_hours],
     steps = it[Goals.steps],
-    created_at = it[Goals.created_at],
-    updated_at = it[Goals.updated_at]
+    distance = it[Goals.distance],
+    created_at = it[Goals.created_at]
 )
 
 fun mapToCategory(it: ResultRow) = Category(

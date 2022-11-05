@@ -72,6 +72,15 @@ class JavalinConfig {
                     patch(HealthTrackerController::updateCategoryByCategoryId)
                 }
             }
+            path("/api/goals"){
+                get(HealthTrackerController::getAllGoals)
+                post(HealthTrackerController::addGoals)
+                path("{goal-id}") {
+                    get(HealthTrackerController::getGoalsByGoalId)
+                    delete(HealthTrackerController::deleteGoalByGoalId)
+                    patch(HealthTrackerController::updateGoalByGoalId)
+                }
+            }
             }
         }
 
