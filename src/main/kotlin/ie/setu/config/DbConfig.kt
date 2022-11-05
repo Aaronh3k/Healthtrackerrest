@@ -7,8 +7,6 @@ import org.jetbrains.exposed.sql.name
 class DbConfig{
 
     private val logger = KotlinLogging.logger {}
-
-    //NOTE: you need the ?sslmode=require otherwise you get an error complaining about the ssl certificate
     fun getDbConnection() :Database{
 
         logger.info{"Starting DB Connection..."}
