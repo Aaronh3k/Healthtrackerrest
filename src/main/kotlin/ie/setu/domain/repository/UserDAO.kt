@@ -27,11 +27,15 @@ class UserDAO {
     }
 
     fun save(user: User) : Int?{
-        return transaction {
-            Users.insert {
-                it[name] = user.name
-                it[email] = user.email
-            } get Users.id
+        return try {
+            transaction {
+                Users.insert {
+                    it[user_name] = user.user_name
+                    it[email] = user.email
+                } get Users.id
+            }
+        }catch (e: Exception){
+            0
         }
     }
 
@@ -53,12 +57,16 @@ class UserDAO {
     }
 
     fun update(id: Int, user: User): Int{
-        return transaction {
-            Users.update ({
-                Users.id eq id}) {
-                it[name] = user.name
-                it[email] = user.email
+        return try{
+            transaction {
+                Users.update ({
+                    Users.id eq id}) {
+                    it[user_name] = user.user_name
+                    it[email] = user.email
+                }
             }
+        }catch (e: Exception){
+            0
         }
     }
 }
