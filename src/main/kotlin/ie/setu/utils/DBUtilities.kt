@@ -46,6 +46,5 @@ fun mapToCategory(it: ResultRow) = Category(
     id = it[Categories.id],
     name = it[Categories.name],
     description = it[Categories.description],
-    created_at = it[Goals.created_at],
-    updated_at = it[Goals.updated_at]
+    created_at = it[Categories.created_at]
 )
