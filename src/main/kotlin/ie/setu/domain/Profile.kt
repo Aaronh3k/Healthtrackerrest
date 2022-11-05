@@ -9,5 +9,4 @@ data class Profile(
     var last_name: String,
     var dob: DateTime,
     var gender: Char,
-    var created_at: DateTime,
-    var updated_at: DateTime)
+    var created_at: DateTime)

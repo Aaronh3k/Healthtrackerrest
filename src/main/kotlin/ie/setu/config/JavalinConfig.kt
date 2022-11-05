@@ -81,6 +81,15 @@ class JavalinConfig {
                     patch(HealthTrackerController::updateGoalByGoalId)
                 }
             }
+            path("/api/profile"){
+                get(HealthTrackerController::getAllUserProfile)
+                post(HealthTrackerController::addUserProfile)
+                path("{profile-id}") {
+                    get(HealthTrackerController::getUserProfileByProfileId)
+                    delete(HealthTrackerController::deleteProfileByProfileId)
+                    patch(HealthTrackerController::updateProfileByProfileId)
+                }
+            }
             }
         }
 
