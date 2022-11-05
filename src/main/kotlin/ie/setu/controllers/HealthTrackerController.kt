@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.joda.JodaModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import ie.setu.domain.Activity
+import ie.setu.domain.Category
 import ie.setu.domain.User
 import ie.setu.domain.repository.ActivityDAO
 import ie.setu.domain.repository.UserDAO
@@ -279,4 +280,121 @@ object HealthTrackerController {
         else
             ctx.status(404)
     }
+
+//--------------------------------------------------------------
+// CategoryDAOI specifics
+//-------------------------------------------------------------
+@OpenApi(
+    summary = "Get all Categories",
+    operationId = "getAllCategories",
+    tags = ["Category"],
+    path = "/api/categories",
+    method = HttpMethod.GET,
+    responses = [OpenApiResponse("200", [OpenApiContent(Array<User>::class)])]
+)
+fun getAllCategories(ctx: Context) {
+    //mapper handles the deserialization of Joda date into a String.
+    val mapper = jacksonObjectMapper()
+        .registerModule(JodaModule())
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    ctx.json(mapper.writeValueAsString( HealthTrackerController.categoryDAO.getAll() ))
+}
+
+@OpenApi(
+    summary = "Get category by ID",
+    operationId = "getCategoriesByCategoryId",
+    tags = ["Category"],
+    path = "/api/categories/{category-id}",
+    method = HttpMethod.GET,
+    pathParams = [OpenApiParam("category-id", Int::class, "The category ID")],
+    responses  = [OpenApiResponse("200", [OpenApiContent(User::class)])]
+)
+fun getCategoriesByCategoryId(ctx: Context) {
+    val category = HealthTrackerController.categoryDAO.findByCategoryId((ctx.pathParam("category-id").toInt()))
+    if (category != null){
+        val mapper = jacksonObjectMapper()
+            .registerModule(JodaModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        ctx.json(mapper.writeValueAsString(category))
+    }
+}
+
+@OpenApi(
+    summary = "Add Category",
+    operationId = "addCategories",
+    tags = ["Category"],
+    path = "/api/categories",
+    method = HttpMethod.POST,
+    pathParams = [OpenApiParam("category-id", Int::class, "The category ID")],
+    responses  = [OpenApiResponse("200")]
+)
+fun addCategories(ctx: Context) {
+    //mapper handles the serialisation of Joda date into a String.
+    val mapper = jacksonObjectMapper()
+        .registerModule(JodaModule())
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    val map = JSONObject(ctx.body()).toMap()
+    map["created_at"] = DateTime.now().toString()
+    val category = mapper.readValue<Category>(JSONObject(map).toString())
+    val categoryId = HealthTrackerController.categoryDAO.save(category)
+    if (categoryId != 0) {
+        category.id = categoryId
+        ctx.json(category)
+        ctx.status(201)
+    }
+    else{
+        ctx.status(400)
+    }
+    ctx.json(category)
+}
+
+@OpenApi(
+    summary = "Delete category by ID",
+    operationId = "deleteCategoryByCategoryId",
+    tags = ["Category"],
+    path = "/api/categories/{category-id}",
+    method = HttpMethod.DELETE,
+    pathParams = [OpenApiParam("category-id", Int::class, "The category ID")],
+    responses  = [OpenApiResponse("204")]
+)
+fun deleteCategoryByCategoryId(ctx: Context){
+    HealthTrackerController.categoryDAO.deleteByCategoryId(ctx.pathParam("category-id").toInt())
+}
+
+@OpenApi(
+    summary = "Delete category by user ID",
+    operationId = "deleteCategoryByUserId",
+    tags = ["Category"],
+    path = "/api/categories/{category-id}",
+    method = HttpMethod.DELETE,
+    pathParams = [OpenApiParam("category-id", Int::class, "The category ID")],
+    responses  = [OpenApiResponse("204")]
+)
+fun deleteCategoryByUserId(ctx: Context){
+    HealthTrackerController.categoryDAO.deleteByCategoryId(ctx.pathParam("category-id").toInt())
+}
+
+@OpenApi(
+    summary = "Update category by category ID",
+    operationId = "updateCategoryByCategoryId",
+    tags = ["Category"],
+    path = "/api/categories/{category-id}",
+    method = HttpMethod.PATCH,
+    pathParams = [OpenApiParam("category-id", Int::class, "The category ID")],
+    responses  = [OpenApiResponse("204")]
+)
+fun updateCategoryByCategoryId(ctx: Context){
+    val mapper = jacksonObjectMapper()
+        .registerModule(JodaModule())
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    val map = JSONObject(ctx.body()).toMap()
+    map["created_at"] = DateTime.now().toString()
+    val category = mapper.readValue<Category>(JSONObject(map).toString())
+    if (categoryDAO.updateByCategoryId(
+            categoryId = ctx.pathParam("category-id").toInt(),
+            categoryDTO = category) != 0)
+        ctx.status(204)
+    else
+        ctx.status(404)
+}
 }

@@ -63,8 +63,17 @@ class JavalinConfig {
                     patch(HealthTrackerController::updateActivity)
                 }
             }
+            path("/api/categories"){
+                get(HealthTrackerController::getAllCategories)
+                post(HealthTrackerController::addCategories)
+                path("{category-id}") {
+                    get(HealthTrackerController::getCategoriesByCategoryId)
+                    delete(HealthTrackerController::deleteCategoryByCategoryId)
+                    patch(HealthTrackerController::updateCategoryByCategoryId)
+                }
+            }
+            }
         }
-    }
 
     private fun getConfiguredOpenApiPlugin() = OpenApiPlugin(
         OpenApiOptions(
