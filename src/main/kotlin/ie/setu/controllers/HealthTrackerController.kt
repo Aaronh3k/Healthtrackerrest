@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.joda.JodaModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import ie.setu.domain.Activity
-import ie.setu.domain.Category
-import ie.setu.domain.Goal
-import ie.setu.domain.User
+import ie.setu.domain.*
 import ie.setu.domain.repository.ActivityDAO
 import ie.setu.domain.repository.UserDAO
 import ie.setu.domain.repository.CategoryDAO
@@ -152,7 +149,7 @@ object HealthTrackerController {
         tags = ["Activity"],
         path = "/api/activities",
         method = HttpMethod.GET,
-        responses = [OpenApiResponse("200", [OpenApiContent(Array<User>::class)])]
+        responses = [OpenApiResponse("200", [OpenApiContent(Array<Activity>::class)])]
     )
     fun getAllActivities(ctx: Context) {
         //mapper handles the deserialization of Joda date into a String.
@@ -169,7 +166,7 @@ object HealthTrackerController {
         path = "/api/activities/user/{user-id}",
         method = HttpMethod.GET,
         pathParams = [OpenApiParam("user-id", Int::class, "The user ID")],
-        responses  = [OpenApiResponse("200", [OpenApiContent(User::class)])]
+        responses  = [OpenApiResponse("200", [OpenApiContent(Activity::class)])]
     )
     fun getActivitiesByUserId(ctx: Context) {
         if (userDao.findById(ctx.pathParam("user-id").toInt()) != null) {
@@ -220,7 +217,7 @@ object HealthTrackerController {
         path = "/api/activities/{activity-id}",
         method = HttpMethod.GET,
         pathParams = [OpenApiParam("activity-id", Int::class, "The activity ID")],
-        responses  = [OpenApiResponse("200", [OpenApiContent(User::class)])]
+        responses  = [OpenApiResponse("200", [OpenApiContent(Activity::class)])]
     )
     fun getActivitiesByActivityId(ctx: Context) {
         val activity = activityDAO.findByActivityId((ctx.pathParam("activity-id").toInt()))
@@ -291,7 +288,7 @@ object HealthTrackerController {
     tags = ["Category"],
     path = "/api/categories",
     method = HttpMethod.GET,
-    responses = [OpenApiResponse("200", [OpenApiContent(Array<User>::class)])]
+    responses = [OpenApiResponse("200", [OpenApiContent(Array<Category>::class)])]
 )
 fun getAllCategories(ctx: Context) {
     //mapper handles the deserialization of Joda date into a String.
@@ -308,7 +305,7 @@ fun getAllCategories(ctx: Context) {
     path = "/api/categories/{category-id}",
     method = HttpMethod.GET,
     pathParams = [OpenApiParam("category-id", Int::class, "The category ID")],
-    responses  = [OpenApiResponse("200", [OpenApiContent(User::class)])]
+    responses  = [OpenApiResponse("200", [OpenApiContent(Category::class)])]
 )
 fun getCategoriesByCategoryId(ctx: Context) {
     val category = HealthTrackerController.categoryDAO.findByCategoryId((ctx.pathParam("category-id").toInt()))
@@ -408,7 +405,7 @@ fun updateCategoryByCategoryId(ctx: Context){
         tags = ["Goal"],
         path = "/api/goals",
         method = HttpMethod.GET,
-        responses = [OpenApiResponse("200", [OpenApiContent(Array<User>::class)])]
+        responses = [OpenApiResponse("200", [OpenApiContent(Array<Goal>::class)])]
     )
     fun getAllGoals(ctx: Context) {
         //mapper handles the deserialization of Joda date into a String.
@@ -425,7 +422,7 @@ fun updateCategoryByCategoryId(ctx: Context){
         path = "/api/goals/{goal-id}",
         method = HttpMethod.GET,
         pathParams = [OpenApiParam("goal-id", Int::class, "The goal ID")],
-        responses  = [OpenApiResponse("200", [OpenApiContent(User::class)])]
+        responses  = [OpenApiResponse("200", [OpenApiContent(Goal::class)])]
     )
     fun getGoalsByGoalId(ctx: Context) {
         val goal = HealthTrackerController.goalDAO.findByGoalId((ctx.pathParam("goal-id").toInt()))
@@ -511,6 +508,123 @@ fun updateCategoryByCategoryId(ctx: Context){
         if (goalDAO.updateByGoalId(
                 goalId = ctx.pathParam("goal-id").toInt(),
                 goalDTO = goal) != 0)
+            ctx.status(204)
+        else
+            ctx.status(404)
+    }
+
+//-------------------------------------------------------------
+// ProfileDAOI specifics
+//-------------------------------------------------------------
+    @OpenApi(
+        summary = "Get all UserProfile",
+        operationId = "getAllUserProfile",
+        tags = ["Profile"],
+        path = "/api/userprofile",
+        method = HttpMethod.GET,
+        responses = [OpenApiResponse("200", [OpenApiContent(Array<Profile>::class)])]
+    )
+    fun getAllUserProfile(ctx: Context) {
+        //mapper handles the deserialization of Joda date into a String.
+        val mapper = jacksonObjectMapper()
+            .registerModule(JodaModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        ctx.json(mapper.writeValueAsString( HealthTrackerController.profileDAO.getAll() ))
+    }
+
+    @OpenApi(
+        summary = "Get profile by ID",
+        operationId = "getUserProfileByProfileId",
+        tags = ["Profile"],
+        path = "/api/userprofile/{profile-id}",
+        method = HttpMethod.GET,
+        pathParams = [OpenApiParam("profile-id", Int::class, "The profile ID")],
+        responses  = [OpenApiResponse("200", [OpenApiContent(Profile::class)])]
+    )
+    fun getUserProfileByProfileId(ctx: Context) {
+        val profile = HealthTrackerController.profileDAO.findByProfileId((ctx.pathParam("profile-id").toInt()))
+        if (profile != null){
+            val mapper = jacksonObjectMapper()
+                .registerModule(JodaModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            ctx.json(mapper.writeValueAsString(profile))
+        }
+    }
+
+    @OpenApi(
+        summary = "Add Profile",
+        operationId = "addUserProfile",
+        tags = ["Profile"],
+        path = "/api/userprofile",
+        method = HttpMethod.POST,
+        pathParams = [OpenApiParam("profile-id", Int::class, "The profile ID")],
+        responses  = [OpenApiResponse("200")]
+    )
+    fun addUserProfile(ctx: Context) {
+        //mapper handles the serialisation of Joda date into a String.
+        val mapper = jacksonObjectMapper()
+            .registerModule(JodaModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        val map = JSONObject(ctx.body()).toMap()
+        map["created_at"] = DateTime.now().toString()
+        val profile = mapper.readValue<Profile>(JSONObject(map).toString())
+        val profileId = HealthTrackerController.profileDAO.save(profile)
+        if (profileId != 0) {
+            profile.id = profileId
+            ctx.json(profile)
+            ctx.status(201)
+        }
+        else{
+            ctx.status(400)
+        }
+        ctx.json(profile)
+    }
+
+    @OpenApi(
+        summary = "Delete profile by ID",
+        operationId = "deleteProfileByProfileId",
+        tags = ["Profile"],
+        path = "/api/userprofile/{profile-id}",
+        method = HttpMethod.DELETE,
+        pathParams = [OpenApiParam("profile-id", Int::class, "The profile ID")],
+        responses  = [OpenApiResponse("204")]
+    )
+    fun deleteProfileByProfileId(ctx: Context){
+        HealthTrackerController.profileDAO.deleteByProfileId(ctx.pathParam("profile-id").toInt())
+    }
+
+    @OpenApi(
+        summary = "Delete profile by user ID",
+        operationId = "deleteProfileByUserId",
+        tags = ["Profile"],
+        path = "/api/userprofile/{profile-id}",
+        method = HttpMethod.DELETE,
+        pathParams = [OpenApiParam("profile-id", Int::class, "The profile ID")],
+        responses  = [OpenApiResponse("204")]
+    )
+    fun deleteProfileByUserId(ctx: Context){
+        HealthTrackerController.profileDAO.deleteByProfileId(ctx.pathParam("profile-id").toInt())
+    }
+
+    @OpenApi(
+        summary = "Update profile by profile ID",
+        operationId = "updateProfileByProfileId",
+        tags = ["Profile"],
+        path = "/api/userprofile/{profile-id}",
+        method = HttpMethod.PATCH,
+        pathParams = [OpenApiParam("profile-id", Int::class, "The profile ID")],
+        responses  = [OpenApiResponse("204")]
+    )
+    fun updateProfileByProfileId(ctx: Context){
+        val mapper = jacksonObjectMapper()
+            .registerModule(JodaModule())
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        val map = JSONObject(ctx.body()).toMap()
+        map["created_at"] = DateTime.now().toString()
+        val profile = mapper.readValue<Profile>(JSONObject(map).toString())
+        if (profileDAO.updateByProfileId(
+                profileId = ctx.pathParam("profile-id").toInt(),
+                profileDTO = profile) != 0)
             ctx.status(204)
         else
             ctx.status(404)

@@ -28,8 +28,7 @@ fun mapToProfile(it: ResultRow) = Profile(
     last_name = it[UserProfiles.last_name],
     dob = it[UserProfiles.dob],
     gender = it[UserProfiles.gender],
-    created_at = it[UserProfiles.created_at],
-    updated_at = it[UserProfiles.updated_at]
+    created_at = it[UserProfiles.created_at]
 )
 fun mapToGoal(it: ResultRow) = Goal(
     id = it[Goals.id],
