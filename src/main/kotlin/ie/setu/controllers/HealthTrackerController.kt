@@ -15,8 +15,6 @@ import io.javalin.http.Context
 import io.javalin.plugin.openapi.annotations.*
 import kong.unirest.json.JSONObject
 import org.joda.time.DateTime
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 object HealthTrackerController {
 
@@ -152,11 +150,14 @@ object HealthTrackerController {
         responses = [OpenApiResponse("200", [OpenApiContent(Array<Activity>::class)])]
     )
     fun getAllActivities(ctx: Context) {
-        //mapper handles the deserialization of Joda date into a String.
-        val mapper = jacksonObjectMapper()
-            .registerModule(JodaModule())
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        ctx.json(mapper.writeValueAsString( activityDAO.getAll() ))
+        val activities = activityDAO.getAll()
+        if (activities.size != 0) {
+            ctx.status(200)
+        }
+        else{
+            ctx.status(404)
+        }
+        ctx.json(activities)
     }
 
     @OpenApi(
@@ -172,15 +173,17 @@ object HealthTrackerController {
         if (userDao.findById(ctx.pathParam("user-id").toInt()) != null) {
             val activities = activityDAO.findByUserId(ctx.pathParam("user-id").toInt())
             if (activities.isNotEmpty()) {
-                //mapper handles the deserialization of Joda date into a String.
-                val mapper = jacksonObjectMapper()
-                    .registerModule(JodaModule())
-                    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-                ctx.json(mapper.writeValueAsString(activities))
+                ctx.json(activities)
+                ctx.status(200)
+            }
+            else{
+                ctx.status(404)
             }
         }
+        else{
+            ctx.status(404)
+        }
     }
-
     @OpenApi(
         summary = "Add Activity",
         operationId = "addActivity",
@@ -191,23 +194,17 @@ object HealthTrackerController {
         responses  = [OpenApiResponse("200")]
     )
     fun addActivity(ctx: Context) {
-        //mapper handles the serialisation of Joda date into a String.
-        val mapper = jacksonObjectMapper()
-            .registerModule(JodaModule())
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        val map = JSONObject(ctx.body()).toMap()
-        map["created_at"] = DateTime.now().toString()
-        val activity = mapper.readValue<Activity>(JSONObject(map).toString())
-        val activityId = activityDAO.save(activity)
-        if (activityId != 0) {
+        val activity : Activity = jsonToObject(ctx.body())
+        val userId = userDao.findById(activity.userId)
+        if (userId != null) {
+            val activityId = activityDAO.save(activity)
             activity.id = activityId
             ctx.json(activity)
             ctx.status(201)
         }
         else{
-            ctx.status(400)
+            ctx.status(404)
         }
-        ctx.json(activity)
     }
 
     @OpenApi(
@@ -222,12 +219,14 @@ object HealthTrackerController {
     fun getActivitiesByActivityId(ctx: Context) {
         val activity = activityDAO.findByActivityId((ctx.pathParam("activity-id").toInt()))
         if (activity != null){
-            val mapper = jacksonObjectMapper()
-                .registerModule(JodaModule())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            ctx.json(mapper.writeValueAsString(activity))
+            ctx.json(activity)
+            ctx.status(200)
+        }
+        else{
+            ctx.status(404)
         }
     }
+
 
     @OpenApi(
         summary = "Delete activity by ID",
@@ -239,7 +238,10 @@ object HealthTrackerController {
         responses  = [OpenApiResponse("204")]
     )
     fun deleteActivityByActivityId(ctx: Context){
-        activityDAO.deleteByActivityId(ctx.pathParam("activity-id").toInt())
+        if (activityDAO.deleteByActivityId(ctx.pathParam("activity-id").toInt()) != 0)
+            ctx.status(204)
+        else
+            ctx.status(404)
     }
 
     @OpenApi(
@@ -252,7 +254,10 @@ object HealthTrackerController {
         responses  = [OpenApiResponse("204")]
     )
     fun deleteActivityByUserId(ctx: Context){
-        activityDAO.deleteByUserId(ctx.pathParam("user-id").toInt())
+        if (activityDAO.deleteByUserId(ctx.pathParam("user-id").toInt()) != 0)
+            ctx.status(204)
+        else
+            ctx.status(404)
     }
 
     @OpenApi(
@@ -265,15 +270,8 @@ object HealthTrackerController {
         responses  = [OpenApiResponse("204")]
     )
     fun updateActivity(ctx: Context){
-        val mapper = jacksonObjectMapper()
-            .registerModule(JodaModule())
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        val map = JSONObject(ctx.body()).toMap()
-        map["created_at"] = DateTime.now().toString()
-        val activity = mapper.readValue<Activity>(JSONObject(map).toString())
-        if (activityDAO.updateByActivityId(
-            activityId = ctx.pathParam("activity-id").toInt(),
-            activityDTO=activity)!=0)
+        val activity : Activity = jsonToObject(ctx.body())
+        if (activityDAO.updateByActivityId(activityId = ctx.pathParam("activity-id").toInt(), activityDTO =activity) != 0)
             ctx.status(204)
         else
             ctx.status(404)
@@ -291,11 +289,14 @@ object HealthTrackerController {
     responses = [OpenApiResponse("200", [OpenApiContent(Array<Category>::class)])]
 )
 fun getAllCategories(ctx: Context) {
-    //mapper handles the deserialization of Joda date into a String.
-    val mapper = jacksonObjectMapper()
-        .registerModule(JodaModule())
-        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-    ctx.json(mapper.writeValueAsString( HealthTrackerController.categoryDAO.getAll() ))
+    val categories = categoryDAO.getAll()
+    if (categories.size != 0) {
+        ctx.status(200)
+    }
+    else{
+        ctx.status(404)
+    }
+    ctx.json(categories)
 }
 
 @OpenApi(
@@ -314,6 +315,9 @@ fun getCategoriesByCategoryId(ctx: Context) {
             .registerModule(JodaModule())
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         ctx.json(mapper.writeValueAsString(category))
+        ctx.status(200)
+    }else{
+        ctx.status(404)
     }
 }
 
@@ -356,7 +360,10 @@ fun addCategories(ctx: Context) {
     responses  = [OpenApiResponse("204")]
 )
 fun deleteCategoryByCategoryId(ctx: Context){
-    HealthTrackerController.categoryDAO.deleteByCategoryId(ctx.pathParam("category-id").toInt())
+    if (categoryDAO.deleteByCategoryId(ctx.pathParam("category-id").toInt()) != 0)
+        ctx.status(204)
+    else
+        ctx.status(404)
 }
 
 @OpenApi(
@@ -369,7 +376,10 @@ fun deleteCategoryByCategoryId(ctx: Context){
     responses  = [OpenApiResponse("204")]
 )
 fun deleteCategoryByUserId(ctx: Context){
-    HealthTrackerController.categoryDAO.deleteByCategoryId(ctx.pathParam("category-id").toInt())
+    if (categoryDAO.deleteByCategoryId(ctx.pathParam("category-id").toInt()) != 0)
+        ctx.status(200)
+    else
+        ctx.status(404)
 }
 
 @OpenApi(
