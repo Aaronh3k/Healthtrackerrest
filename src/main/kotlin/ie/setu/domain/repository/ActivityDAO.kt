@@ -29,7 +29,7 @@ class ActivityDAO {
     }
 
     //Find all activities for a specific user id
-    fun findByUserId(userId: Int): List<Activity>{
+    fun findByUserId(userId: Int): List<Activity?> {
         return transaction {
             Activities
                 .select {Activities.userId eq userId}
@@ -38,20 +38,24 @@ class ActivityDAO {
     }
 
     //Save an activity to the database
-    fun save(activity: Activity){
-        transaction {
-            Activities.insert {
-                it[description] = activity.description
-                it[duration] = activity.duration
-                it[started] = activity.started
-                it[calories] = activity.calories
-                it[userId] = activity.userId
-            }
-        }
+    fun save(activity: Activity): Int {
+        return transaction {
+                Activities.insert {
+                    it[description] = activity.description
+                    it[duration] = activity.duration
+                    it[calories] = activity.calories
+                    it[started] = activity.started
+                    it[userId] = activity.userId
+                    it[categoryId] = activity.categoryId
+                    it[distance] = activity.distance
+                    it[created_at] = activity.created_at
+                }
+            } get Activities.id
     }
 
-    fun updateByActivityId(activityId: Int, activityDTO: Activity){
-        transaction {
+    fun updateByActivityId(activityId: Int, activityDTO: Activity): Int{
+        return try {
+            transaction {
             Activities.update ({
                 Activities.id eq activityId}) {
                 it[description] = activityDTO.description
@@ -59,7 +63,13 @@ class ActivityDAO {
                 it[started] = activityDTO.started
                 it[calories] = activityDTO.calories
                 it[userId] = activityDTO.userId
+                it[categoryId] = activityDTO.categoryId
+                it[distance] = activityDTO.distance
+                it[created_at] = activityDTO.created_at
             }
+        }
+        }catch (e: Exception){
+            0
         }
     }
     fun deleteByActivityId (activityId: Int): Int{

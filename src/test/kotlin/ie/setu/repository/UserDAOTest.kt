@@ -1,5 +1,6 @@
 package ie.setu.repository
 
+import ie.setu.controllers.addUser
 import ie.setu.domain.db.Users
 import ie.setu.domain.User
 import ie.setu.domain.repository.UserDAO
@@ -14,9 +15,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 //retrieving some test data from Fixtures
-val user1 = users.get(0)
-val user2 = users.get(1)
-val user3 = users.get(2)
+val user1 = users[0]
+val user2 = users[1]
+val user3 = users[2]
 
 class UserDAOTest {
 
@@ -60,11 +61,7 @@ class UserDAOTest {
         fun `get user by id that exists, results in a correct user returned`() {
             transaction {
                 //Arrange - create and populate table with three users
-                SchemaUtils.create(Users)
-                val userDAO = UserDAO()
-                userDAO.save(user1)
-                userDAO.save(user2)
-                userDAO.save(user3)
+                val userDAO = populateUserTable()
 
                 //Act & Assert
                 assertEquals(null, userDAO.findById(4))
@@ -125,6 +122,32 @@ class UserDAOTest {
                 assertEquals(user3, userDAO.findById(user3.id))
             }
         }
+
+        @Test
+        fun `user added with existing username in table results in unsuccessful creation`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateUserTable()
+                val usercreation = addUser(user_name = "bob_cat", email = "bob@gmail.com")
+
+                //Act & Assert
+                assertEquals(400, usercreation.status)
+            }
+        }
+
+        @Test
+        fun `user added with existing email in table results in unsuccessful creation`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateUserTable()
+                val usercreation = addUser(user_name = "test", email = "bob@cat.ie")
+
+                //Act & Assert
+                assertEquals(400, usercreation.status)
+            }
+        }
     }
 
     @Nested
@@ -158,6 +181,33 @@ class UserDAOTest {
                 assertEquals(3, userDAO.getAll().size)
             }
         }
+
+        @Test
+        fun `updating existing user in table with same username results in unsuccessful update`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateUserTable()
+
+                //Act & Assert
+                val user3Updated = User(3, "bob_cat", "new@email.ie")
+                assertEquals(0,userDAO.update(user3.id, user3Updated))
+            }
+        }
+
+        @Test
+        fun `updating existing user in table with same email results in unsuccessful update`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateUserTable()
+
+                //Act & Assert
+                val user3Updated = User(3, "user_test", "alice@wonderland.com")
+                assertEquals(0,userDAO.update(user3.id, user3Updated))
+            }
+        }
+
     }
 
     @Nested

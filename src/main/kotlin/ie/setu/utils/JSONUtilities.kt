@@ -13,6 +13,7 @@ import kong.unirest.JsonNode
 //More info: https://www.baeldung.com/jackson-object-mapper-tutorial
 //           https://www.baeldung.com/jackson-serialize-dates
 //           https://www.baeldung.com/kotlin/reified-functions
+//           https://www.baeldung.com/kotlin/generics
 
 inline fun <reified T: Any> jsonToObject(json: String) : T
         = jacksonObjectMapper()
@@ -20,7 +21,7 @@ inline fun <reified T: Any> jsonToObject(json: String) : T
     .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
     .readValue<T>(json)
 
-inline fun <reified T: Any>  jsonNodeToObject(jsonNode : HttpResponse<JsonNode>) : T {
+inline fun <reified T: Any>  jsonNodeToObject(jsonNode: HttpResponse<JsonNode>) : T {
     return jsonToObject<T>(jsonNode.body.toString())
 }
 
