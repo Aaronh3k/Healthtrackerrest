@@ -34,7 +34,7 @@ class ProfileDAO {
 
     //Save a Profile to the database
     fun save(profile: Profile): Int {
-        return transaction {
+        return try { transaction {
             UserProfiles.insert {
                 it[userId] = profile.userId
                 it[first_name] = profile.first_name
@@ -44,6 +44,9 @@ class ProfileDAO {
                 it[created_at] = profile.created_at
             }
         } get UserProfiles.id
+    }catch (e: Exception){
+        0
+    }
     }
 
     fun updateByProfileId(profileId: Int, profileDTO: Profile): Int{

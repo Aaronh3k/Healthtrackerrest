@@ -1,5 +1,6 @@
 package ie.setu.repository
 
+import ie.setu.controllers.addUserProfile
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -9,12 +10,11 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import ie.setu.domain.db.UserProfiles
 import ie.setu.domain.Profile
-import ie.setu.domain.User
 import ie.setu.domain.repository.ProfileDAO
 import ie.setu.helpers.populateProfileTable
 import ie.setu.helpers.userprofile
-import ie.setu.helpers.populateProfileTable
 import ie.setu.helpers.populateUserTable
+import junit.framework.TestCase
 import kotlin.test.assertEquals
 
 //retrieving some test data from Fixtures
@@ -47,6 +47,20 @@ class ProfileDAOTest {
                 assertEquals(profile1, profileDAO.findByProfileId(profile1.id))
                 assertEquals(profile2, profileDAO.findByProfileId(profile2.id))
                 assertEquals(profile3, profileDAO.findByProfileId(profile3.id))
+            }
+        }
+
+        @Test
+        fun `userprofile added with existing userId in table results in unsuccessful creation`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateProfileTable()
+                val `userprofilecreation` = addUserProfile(userId = 1, first_name = "Test", last_name = "Test",
+                dob = DateTime.parse("1998-06-11"), gender = 'M', created_at = DateTime.now())
+
+                //Act & Assert
+                TestCase.assertEquals(404, `userprofilecreation`.status)
             }
         }
     }
@@ -142,6 +156,21 @@ class ProfileDAOTest {
                     dob = DateTime.parse("1998-06-11"), created_at = DateTime.now(), userId = 2)
                 profileDAO.updateByProfileId(profile3updated.id, profile3updated)
                 assertEquals(profile3updated, profileDAO.findByProfileId(3))
+            }
+        }
+
+        @Test
+        fun `updating existing profile in table with existing userId results in unsuccessful update`() {
+            transaction {
+
+                //Arrange - create and populate tables with three users and userprofile
+                populateUserTable()
+                val profileDAO = populateProfileTable()
+
+                //Act & Assert
+                val profile3updated = Profile(id = 3, first_name = "Test", last_name = "test", gender = 'M',
+                    dob = DateTime.parse("1998-06-11"), created_at = DateTime.now(), userId = 1)
+                assertEquals(0, profileDAO.updateByProfileId(profile3updated.id, profile3updated))
             }
         }
 

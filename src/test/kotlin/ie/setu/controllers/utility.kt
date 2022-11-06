@@ -146,3 +146,79 @@ fun addCategory(
             """.trimIndent())
         .asJson()
 }
+
+//helper function to retrieve all goals
+fun retrieveAllGoals(): HttpResponse<JsonNode> {
+    return Unirest.get("$origin/api/goals").asJson()
+}
+
+//helper function to retrieve goal by goal id
+fun retrieveGoalById(id: Int): HttpResponse<JsonNode> {
+    return Unirest.get(origin + "/api/goals/${id}").asJson()
+}
+
+//helper function to retrieve goals by user id
+fun retrieveGoalsByUserId(id: Int): HttpResponse<JsonNode> {
+    return Unirest.get(origin + "/api/users/${id}/goals").asJson()
+}
+
+//helper function to delete a goal by goal id
+fun deleteGoalByGoaId(id: Int): HttpResponse<String> {
+    return Unirest.delete("$origin/api/goals/$id").asString()
+}
+
+//helper function to delete an goal by user id
+fun deleteGoalsByUserId(id: Int): HttpResponse<String> {
+    return Unirest.delete("$origin/api/users/$id/goals").asString()
+}
+
+//helper function to update a goal to the database
+fun updateGoal(id: Int, userId: Int, calories: Int, standing_hours: Double, steps: Int,
+distance: Int): HttpResponse<JsonNode> {
+    return Unirest.patch("$origin/api/goals/$id")
+        .body("""
+                {
+                   "userId":$userId,
+                   "calories":"$calories",
+                   "standing_hours":"$standing_hours",
+                   "steps":"$steps",
+                   "distance":"$distance",
+                   "created_at":"${DateTime.now()}"
+                }
+            """.trimIndent()).asJson()
+}
+
+//helper function to add a Goal
+fun addGoal(
+    userId: Int, calories: Int, standing_hours: Double, steps: Int,
+    distance: Int): HttpResponse<JsonNode> {
+    return Unirest.post("$origin/api/goals")
+        .body("""
+                {
+                   "userId":$userId,
+                   "calories":"$calories",
+                   "standing_hours":"$standing_hours",
+                   "steps":"$steps",
+                   "distance":"$distance",
+                   "created_at":"${DateTime.now()}"
+                }
+            """.trimIndent())
+        .asJson()
+}
+
+//helper function to add a test userprofile to the database
+fun addUserProfile(userId: Int, first_name: String, last_name: String, dob: DateTime, gender: Char,
+                   created_at: DateTime): HttpResponse<JsonNode> {
+    return Unirest.post("$origin/api/userprofile")
+        .body("""
+                {
+                   "first_name":"$first_name",
+                   "last_name":$last_name,
+                   "dob":$dob,
+                   "gender":"$gender",
+                   "userId":$userId,
+                   "created_at":"$created_at"
+                }
+            """.trimIndent())
+        .asJson()
+}
