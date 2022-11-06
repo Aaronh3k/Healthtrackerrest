@@ -30,6 +30,11 @@ const val category_name = "Indoor"
 const val category_description = "Indoor Desc"
 val updateCreatedAt: DateTime = DateTime.now()
 
+val goal_standing_hours = 5.0
+val goal_steps = 2100
+val goal_calories = 500
+val goal_distance = 7
+
 val users = arrayListOf<User>(
     User(user_name = "alice_wonderland", email = "alice@wonderland.com", id = 1),
     User(user_name = "bob_cat", email = "bob@cat.ie", id = 2),

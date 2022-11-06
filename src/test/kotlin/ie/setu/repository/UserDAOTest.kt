@@ -1,5 +1,6 @@
 package ie.setu.repository
 
+import ie.setu.controllers.addUser
 import ie.setu.domain.db.Users
 import ie.setu.domain.User
 import ie.setu.domain.repository.UserDAO
@@ -121,6 +122,32 @@ class UserDAOTest {
                 assertEquals(user3, userDAO.findById(user3.id))
             }
         }
+
+        @Test
+        fun `user added with existing username in table results in unsuccessful creation`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateUserTable()
+                val usercreation = addUser(user_name = "bob_cat", email = "bob@gmail.com")
+
+                //Act & Assert
+                assertEquals(400, usercreation.status)
+            }
+        }
+
+        @Test
+        fun `user added with existing email in table results in unsuccessful creation`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateUserTable()
+                val usercreation = addUser(user_name = "test", email = "bob@cat.ie")
+
+                //Act & Assert
+                assertEquals(400, usercreation.status)
+            }
+        }
     }
 
     @Nested
@@ -154,6 +181,33 @@ class UserDAOTest {
                 assertEquals(3, userDAO.getAll().size)
             }
         }
+
+        @Test
+        fun `updating existing user in table with same username results in unsuccessful update`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateUserTable()
+
+                //Act & Assert
+                val user3Updated = User(3, "bob_cat", "new@email.ie")
+                assertEquals(0,userDAO.update(user3.id, user3Updated))
+            }
+        }
+
+        @Test
+        fun `updating existing user in table with same email results in unsuccessful update`() {
+            transaction {
+
+                //Arrange - create and populate table with three users
+                val userDAO = populateUserTable()
+
+                //Act & Assert
+                val user3Updated = User(3, "user_test", "alice@wonderland.com")
+                assertEquals(0,userDAO.update(user3.id, user3Updated))
+            }
+        }
+
     }
 
     @Nested

@@ -617,7 +617,7 @@ fun updateCategoryByCategoryId(ctx: Context){
             ctx.status(204)
         else{
         val profileId = profileDAO.save(userprofile)
-        if (profileId != null) {
+        if (profileId != 0) {
             userprofile.id = profileId
             ctx.json(userprofile)
             ctx.status(201)
