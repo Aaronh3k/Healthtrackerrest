@@ -428,4 +428,128 @@ class HealthTrackerControllerTest {
             assertEquals(404, retrieveActivityByActivityId(addedActivity3.id).status)
         }
     }
+
+    @Nested
+    inner class CreateCategories {
+
+        @Test
+        fun `add an category, returns a 201 response`() {
+
+            val addCategoryResponse = addCategory(
+                categories[0].name, categories[0].description
+            )
+            assertEquals(201, addCategoryResponse.status)
+
+            //delete added category
+            deleteCategoryByCategoryId(addCategoryResponse.body.`object`.get("id") as Int)
+        }
+    }
+    @Nested
+    inner class ReadCategories {
+
+        @Test
+        fun `get all categories from the database returns 200 or 404 response`() {
+            val response = retrieveAllCategories()
+            if (response.status == 200){
+                val retrievedCategories = jsonNodeToObject<Array<Category>>(response)
+                assertNotEquals(0, retrievedCategories.size)
+            }
+            else{
+                assertEquals(404, response.status)
+            }
+        }
+
+        @Test
+        fun `get category by category id when no category exists returns 404 response`() {
+            //Arrange
+            val categoryId = -1
+            //Assert and Act - attempt to retrieve the category by category id
+            val response = retrieveCategoryById(categoryId)
+            assertEquals(404, response.status)
+        }
+
+
+        @Test
+        fun `get category by category id when category exists returns 200 response`() {
+            val addCategoryResponse = addCategory(
+                categories[0].name, categories[0].description)
+            assertEquals(201, addCategoryResponse.status)
+            val addedCategory = jsonNodeToObject<Category>(addCategoryResponse)
+
+            //Act & Assert - retrieve the category by category id
+            val response = retrieveCategoryById(addedCategory.id)
+            assertEquals(200, response.status)
+
+            //After - delete the added category a 204 is returned
+            assertEquals(204, deleteCategoryByCategoryId(response.body.`object`.get("id") as Int).status)
+        }
+
+    }
+
+    @Nested
+    inner class UpdateCategories {
+
+        @Test
+        fun `updating an category by category id when it doesn't exist, returns a 404 response`() {
+            val categoryId = -1
+
+
+            //Act & Assert - attempt to update the details of a category that doesn't exist
+            assertEquals(
+                404, updateCategory(
+                    categoryId, category_name, category_description
+                ).status
+            )
+        }
+
+        @Test
+        fun `updating an category by category id when it exists, returns 204 response`() {
+
+            //Arrange - add a category that we plan to do an update on
+            val addCategoryResponse = addCategory(
+                categories[0].name, categories[0].description)
+            assertEquals(201, addCategoryResponse.status)
+            val addedCategory = jsonNodeToObject<Category>(addCategoryResponse)
+
+            //Act & Assert - update the added category and assert a 204 is returned
+            val updatedCategoryResponse = updateCategory(addedCategory.id, category_name, updatedDescription)
+            assertEquals(204, updatedCategoryResponse.status)
+
+            //Assert that the individual fields were all updated as expected
+            val retrievedCategoryResponse = retrieveCategoryById(addedCategory.id)
+            val updatedCategory = jsonNodeToObject<Category>(retrievedCategoryResponse)
+            assertEquals(updatedDescription,updatedCategory.description)
+            assertEquals(category_name, updatedCategory.name)
+
+            //delete created category
+            deleteCategoryByCategoryId(addedCategory.id)
+        }
+    }
+
+    @Nested
+    inner class DeleteCategories {
+
+        @Test
+        fun `deleting an category by category id when it doesn't exist, returns a 404 response`() {
+            //Act & Assert - attempt to delete a category that doesn't exist
+            assertEquals(404, deleteCategoryByCategoryId(-1).status)
+        }
+
+        @Test
+        fun `deleting an category by id when it exists, returns a 204 response`() {
+
+            //Arrange - add a category that we plan to do delete on
+            val addCategoryResponse = addCategory(
+                categories[0].name, categories[0].description)
+            assertEquals(201, addCategoryResponse.status)
+
+            //Act & Assert - delete the added category and assert a 204 is returned
+            val addedCategory = jsonNodeToObject<Category>(addCategoryResponse)
+            assertEquals(204, deleteCategoryByCategoryId(addedCategory.id).status)
+
+            //After - delete the category
+            deleteCategoryByCategoryId(addedCategory.id)
+        }
+
+    }
 }
