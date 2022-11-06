@@ -29,7 +29,7 @@ class CategoryDAO {
     }
 
     //Save a Category to the database
-    fun save(Category: Category): Int {
+    fun save(Category: Category): Int? {
         return transaction {
             Categories.insert {
                 it[name] = Category.name

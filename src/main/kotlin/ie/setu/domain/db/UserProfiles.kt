@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.ReferenceOption
 
 object UserProfiles : Table("user_profile") {
     val id = integer("id").autoIncrement().primaryKey()
-    val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE)
+    val userId = integer("user_id").references(Users.id, onDelete = ReferenceOption.CASCADE).uniqueIndex()
     val first_name = varchar("first_name", 100)
     val last_name = varchar("last_name", 100)
     val dob = datetime("dob")

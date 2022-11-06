@@ -1,9 +1,13 @@
 package ie.setu.domain.repository
 
+import ie.setu.domain.Activity
 import ie.setu.domain.Goal
+import ie.setu.domain.db.Activities
 import ie.setu.domain.db.Goals
+import ie.setu.utils.mapToActivity
 import ie.setu.utils.mapToGoal
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class GoalDAO {
@@ -25,6 +29,15 @@ class GoalDAO {
                 .select() { Goals.id eq id}
                 .map{mapToGoal(it)}
                 .firstOrNull()
+        }
+    }
+
+    //Find all goals for a specific user id
+    fun findByUserId(userId: Int): List<Goal?> {
+        return transaction {
+            Goals
+                .select { Goals.userId eq userId}
+                .map { mapToGoal(it) }
         }
     }
 
@@ -62,6 +75,12 @@ class GoalDAO {
     fun deleteByGoalId (goalId: Int): Int{
         return transaction{
             Goals.deleteWhere { Goals.id eq goalId }
+        }
+    }
+
+    fun deleteByUserId (userId: Int): Int{
+        return transaction{
+            Goals.deleteWhere { Goals.userId eq userId }
         }
     }
 }
