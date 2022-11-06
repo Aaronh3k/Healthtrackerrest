@@ -1,9 +1,13 @@
 package ie.setu.domain.repository
 
+import ie.setu.domain.Goal
 import ie.setu.domain.Profile
+import ie.setu.domain.db.Goals
 import ie.setu.domain.db.UserProfiles
+import ie.setu.utils.mapToGoal
 import ie.setu.utils.mapToProfile
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class ProfileDAO {
@@ -62,6 +66,21 @@ class ProfileDAO {
     fun deleteByProfileId(goalId: Int): Int{
         return transaction{
             UserProfiles.deleteWhere { UserProfiles.id eq goalId }
+        }
+    }
+
+    //Find all profiles for a specific user id
+    fun findByUserId(userId: Int): List<Profile?> {
+        return transaction {
+            UserProfiles
+                .select { UserProfiles.userId eq userId}
+                .map { mapToProfile(it) }
+        }
+    }
+
+    fun deleteByUserId (userId: Int): Int{
+        return transaction{
+            UserProfiles.deleteWhere { UserProfiles.userId eq userId }
         }
     }
 }

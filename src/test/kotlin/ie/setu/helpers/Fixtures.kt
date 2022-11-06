@@ -1,12 +1,14 @@
 package ie.setu.helpers
 
-import ie.setu.domain.Activity
-import ie.setu.domain.User
-import ie.setu.domain.Category
+import ie.setu.domain.*
 import ie.setu.domain.db.Activities
+import ie.setu.domain.db.UserProfiles
+import ie.setu.domain.db.Goals
 import ie.setu.domain.db.Users
 import ie.setu.domain.db.Categories
 import ie.setu.domain.repository.ActivityDAO
+import ie.setu.domain.repository.GoalDAO
+import ie.setu.domain.repository.ProfileDAO
 import ie.setu.domain.repository.CategoryDAO
 import ie.setu.domain.repository.UserDAO
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -29,10 +31,10 @@ const val category_description = "Indoor Desc"
 val updateCreatedAt: DateTime = DateTime.now()
 
 val users = arrayListOf<User>(
-    User(user_name = "Alice Wonderland", email = "alice@wonderland.com", id = 1),
-    User(user_name = "Bob Cat", email = "bob@cat.ie", id = 2),
-    User(user_name = "Mary Contrary", email = "mary@contrary.com", id = 3),
-    User(user_name = "Carol Singer", email = "carol@singer.com", id = 4)
+    User(user_name = "alice_wonderland", email = "alice@wonderland.com", id = 1),
+    User(user_name = "bob_cat", email = "bob@cat.ie", id = 2),
+    User(user_name = "mary_contrary", email = "mary@contrary.com", id = 3),
+    User(user_name = "carol_singer", email = "carol@singer.com", id = 4)
 )
 
 val categories = arrayListOf<Category>(
@@ -45,6 +47,18 @@ val activities = arrayListOf<Activity>(
     Activity(id = 1, description = "Running", duration = 22.0, calories = 230.0, started = DateTime.now(), userId = 1, categoryId = 2, distance = 3.5, created_at = DateTime.now()),
     Activity(id = 2, description = "Hopping", duration = 10.5, calories = 80.0, started = DateTime.now(), userId = 3, categoryId = 1, distance = 5.5, created_at = DateTime.now()),
     Activity(id = 3, description = "Walking", duration = 12.0, calories = 120.0, started = DateTime.now(), userId = 2, categoryId = 3, distance = 6.5, created_at = DateTime.now())
+)
+
+val goals = arrayListOf<Goal>(
+    Goal(id = 1, standing_hours = 2.0, steps = 2200, calories = 230,  userId = 1, distance = 3, created_at = DateTime.now()),
+    Goal(id = 2, standing_hours = 5.0, steps = 1000, calories = 80, userId = 3, distance = 5, created_at = DateTime.now()),
+    Goal(id = 3, standing_hours = 4.5, steps = 1200, calories = 120, userId = 2, distance = 6, created_at = DateTime.now())
+)
+
+val userprofile = arrayListOf<Profile>(
+    Profile(id = 1, first_name = "Test", last_name = "test", gender = 'M',  dob = DateTime.parse("1998-06-11"), created_at = DateTime.now(), userId = 1),
+    Profile(id = 2, first_name = "Aaron", last_name = "Pinto", gender = 'M',  dob = DateTime.parse("1990-06-11"), created_at = DateTime.now(), userId = 3),
+    Profile(id = 3, first_name = "First", last_name = "Name", gender = 'F',  dob = DateTime.parse("1995-06-11"), created_at = DateTime.now(), userId = 2),
 )
 
 fun populateUserTable(): UserDAO {
@@ -71,4 +85,22 @@ fun populateCategoryTable(): CategoryDAO {
     categoryDAO.save(categories[1])
     categoryDAO.save(categories[2])
     return categoryDAO
+}
+
+fun populateGoalTable(): GoalDAO {
+    SchemaUtils.create(Goals)
+    val goalDAO = GoalDAO()
+    goalDAO.save(goals[0])
+    goalDAO.save(goals[1])
+    goalDAO.save(goals[2])
+    return goalDAO
+}
+
+fun populateProfileTable(): ProfileDAO {
+    SchemaUtils.create(UserProfiles)
+    val profileDAO = ProfileDAO()
+    profileDAO.save(userprofile[0])
+    profileDAO.save(userprofile[1])
+    profileDAO.save(userprofile[2])
+    return profileDAO
 }
