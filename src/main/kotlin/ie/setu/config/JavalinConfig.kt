@@ -3,33 +3,33 @@ package ie.setu.config
 import ie.setu.controllers.HealthTrackerController
 import ie.setu.utils.jsonObjectMapper
 import io.javalin.Javalin
-import io.javalin.apibuilder.ApiBuilder
 import io.javalin.apibuilder.ApiBuilder.*
 import io.javalin.plugin.json.JavalinJackson
 import io.javalin.plugin.openapi.ui.SwaggerOptions
 import io.javalin.plugin.openapi.OpenApiOptions
 import io.javalin.plugin.openapi.OpenApiPlugin
 import io.javalin.plugin.openapi.ui.ReDocOptions
+import io.javalin.plugin.rendering.vue.VueComponent
 import io.swagger.v3.oas.models.info.Info
 
 class JavalinConfig {
-
     fun startJavalinService(): Javalin {
         val app = Javalin.create {
             it.registerPlugin(getConfiguredOpenApiPlugin())
             it.defaultContentType = "application/json"
+            //added this jsonMapper for our integration tests - serialise objects to json
             it.jsonMapper(JavalinJackson(jsonObjectMapper()))
             it.enableWebjars()
         }.apply {
             exception(Exception::class.java) { e, _ -> e.printStackTrace() }
             error(404) { ctx -> ctx.json("404 - Not Found") }
-        }.start(getHerokuAssignedPort())
+        }.start(getRemoteAssignedPort())
 
         registerRoutes(app)
         return app
     }
 
-    private fun getHerokuAssignedPort(): Int {
+    private fun getRemoteAssignedPort(): Int {
         val herokuPort = System.getenv("PORT")
         return if (herokuPort != null) {
             Integer.parseInt(herokuPort)
@@ -38,6 +38,10 @@ class JavalinConfig {
 
     private fun registerRoutes(app: Javalin) {
         app.routes {
+            get("/", VueComponent("<home-page></home-page>"))
+            get("/users", VueComponent("<user-overview></user-overview>"))
+            get("/users/{user-id}", VueComponent("<user-profile></user-profile>"))
+            get("/users/{user-id}/activities", VueComponent("<user-activity-overview></user-activity-overview>"))
             path("/api/users") {
                 get(HealthTrackerController::getAllUsers)
                 post(HealthTrackerController::addUser)
@@ -98,6 +102,7 @@ class JavalinConfig {
                     patch(HealthTrackerController::updateProfileByProfileId)
                 }
             }
+
             }
         }
 
