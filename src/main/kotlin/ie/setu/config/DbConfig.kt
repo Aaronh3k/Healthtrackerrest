@@ -9,18 +9,26 @@ class DbConfig{
     private val logger = KotlinLogging.logger {}
     fun getDbConnection() :Database{
 
+        val logger = KotlinLogging.logger {}
         logger.info{"Starting DB Connection..."}
 
-        val dbConfig = Database.connect(
-            "jdbc:postgresql://ec2-54-173-237-110.compute-1.amazonaws.com:5432/db312aubut6p30?sslmode=require",
-            driver = "org.postgresql.Driver",
-            user = "kfollkuorwkkma",
-            password = "070dff8fb882b22fc9ab0146e9d57435b7c1e3627f08f2a47adaf018e52b3f49")
+        val PGUSER = "rrgjmhqr"
+        val PGPASSWORD = "HTN7uaaQ2vyS8M8cXHBkYdzxT4IjpXdv"
+        val PGHOST = "mel.db.elephantsql.com"
+        val PGPORT = "5432"
+        val PGDATABASE = "rrgjmhqr"
 
-        logger.info{"DbConfig name = " + dbConfig.name}
-        logger.info{"DbConfig url = " + dbConfig.url}
+        //url format should be jdbc:postgresql://host:port/database
+        val url = "jdbc:postgresql://$PGHOST:$PGPORT/$PGDATABASE"
+
+        val dbConfig = Database.connect(url,
+            driver="org.postgresql.Driver",
+            user = PGUSER,
+            password = PGPASSWORD
+        )
+
+        logger.info{"db url - connection: " + dbConfig.url}
 
         return dbConfig
     }
-
 }
