@@ -1,6 +1,6 @@
 package ie.setu.config
 
-import ie.setu.controllers.HealthTrackerController
+import ie.setu.controllers.*
 import ie.setu.utils.jsonObjectMapper
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
@@ -43,63 +43,63 @@ class JavalinConfig {
             get("/users/{user-id}", VueComponent("<user-profile></user-profile>"))
             get("/users/{user-id}/activities", VueComponent("<user-activity-overview></user-activity-overview>"))
             path("/api/users") {
-                get(HealthTrackerController::getAllUsers)
-                post(HealthTrackerController::addUser)
+                get(UserController::getAllUsers)
+                post(UserController::addUser)
                 path("{user-id}"){
-                    get(HealthTrackerController::getUserByUserId)
-                    delete(HealthTrackerController::deleteUser)
-                    patch(HealthTrackerController::updateUser)
+                    get(UserController::getUserByUserId)
+                    delete(UserController::deleteUser)
+                    patch(UserController::updateUser)
                     path("activities"){
-                        get(HealthTrackerController::getActivitiesByUserId)
-                        delete(HealthTrackerController::deleteActivityByUserId)
+                        get(ActivityController::getActivitiesByUserId)
+                        delete(ActivityController::deleteActivityByUserId)
                     }
                     path("goals"){
-                        get(HealthTrackerController::getGoalsByUserId)
-                        delete(HealthTrackerController::deleteGoalByUserId)
+                        get(GoalController::getGoalsByUserId)
+                        delete(GoalController::deleteGoalByUserId)
                     }
                     path("userprofile"){
-                        get(HealthTrackerController::getUserProfileByUserId)
-                        delete(HealthTrackerController::deleteProfileByUserId)
+                        get(ProfileController::getUserProfileByUserId)
+                        delete(ProfileController::deleteProfileByUserId)
                     }
                 }
                 path("/email/{email}"){
-                    get(HealthTrackerController::getUserByEmail)
+                    get(UserController::getUserByEmail)
                 }
             }
             path("/api/activities") {
-                get(HealthTrackerController::getAllActivities)
-                post(HealthTrackerController::addActivity)
+                get(ActivityController::getAllActivities)
+                post(ActivityController::addActivity)
                 path("{activity-id}") {
-                    get(HealthTrackerController::getActivitiesByActivityId)
-                    delete(HealthTrackerController::deleteActivityByActivityId)
-                    patch(HealthTrackerController::updateActivity)
+                    get(ActivityController::getActivitiesByActivityId)
+                    delete(ActivityController::deleteActivityByActivityId)
+                    patch(ActivityController::updateActivity)
                 }
             }
             path("/api/categories"){
-                get(HealthTrackerController::getAllCategories)
-                post(HealthTrackerController::addCategories)
+                get(CategoryController::getAllCategories)
+                post(CategoryController::addCategories)
                 path("{category-id}") {
-                    get(HealthTrackerController::getCategoriesByCategoryId)
-                    delete(HealthTrackerController::deleteCategoryByCategoryId)
-                    patch(HealthTrackerController::updateCategoryByCategoryId)
+                    get(CategoryController::getCategoriesByCategoryId)
+                    delete(CategoryController::deleteCategoryByCategoryId)
+                    patch(CategoryController::updateCategoryByCategoryId)
                 }
             }
             path("/api/goals"){
-                get(HealthTrackerController::getAllGoals)
-                post(HealthTrackerController::addGoals)
+                get(GoalController::getAllGoals)
+                post(GoalController::addGoals)
                 path("{goal-id}") {
-                    get(HealthTrackerController::getGoalsByGoalId)
-                    delete(HealthTrackerController::deleteGoalByGoalId)
-                    patch(HealthTrackerController::updateGoalByGoalId)
+                    get(GoalController::getGoalsByGoalId)
+                    delete(GoalController::deleteGoalByGoalId)
+                    patch(GoalController::updateGoalByGoalId)
                 }
             }
             path("/api/profile"){
-                get(HealthTrackerController::getAllUserProfile)
-                post(HealthTrackerController::addUserProfile)
+                get(ProfileController::getAllUserProfile)
+                post(ProfileController::addUserProfile)
                 path("{profile-id}") {
-                    get(HealthTrackerController::getUserProfileByProfileId)
-                    delete(HealthTrackerController::deleteProfileByProfileId)
-                    patch(HealthTrackerController::updateProfileByProfileId)
+                    get(ProfileController::getUserProfileByProfileId)
+                    delete(ProfileController::deleteProfileByProfileId)
+                    patch(ProfileController::updateProfileByProfileId)
                 }
             }
 

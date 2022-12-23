@@ -9,14 +9,16 @@ import ie.setu.helpers.*
 import ie.setu.utils.jsonToObject
 import ie.setu.utils.jsonNodeToObject
 import kong.unirest.Unirest
+import org.jetbrains.exposed.sql.Database
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class HealthTrackerControllerTest {
+class ControllerTest {
 
     private val db = DbConfig().getDbConnection()
 /*    private val app = ServerContainer.instance
