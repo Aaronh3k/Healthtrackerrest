@@ -244,9 +244,9 @@ class UserDAOTest {
     internal fun populateUserTable(): UserDAO{
         SchemaUtils.create(Users)
         val userDAO = UserDAO()
-        userDAO.save(user1)
-        userDAO.save(user2)
-        userDAO.save(user3)
+        userDAO.create(user1)
+        userDAO.create(user2)
+        userDAO.create(user3)
         return userDAO
     }
 }
