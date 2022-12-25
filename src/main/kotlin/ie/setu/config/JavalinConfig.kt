@@ -91,12 +91,12 @@ class JavalinConfig() {
             path("/api/users") {
                 get(UserController::getAllUsers, Roles.ADMIN)
                 path("{user-id}"){
-                    get(UserController::getUserByUserId, Roles.USER, Roles.ADMIN)
+                    get(UserController::getUserByUserId, Roles.ADMIN)
                     delete(UserController::deleteUser, Roles.ADMIN)
-                    patch(UserController::updateUser, Roles.USER, Roles.ADMIN)
+                    patch(UserController::updateUser, Roles.ADMIN)
                     path("activities"){
-                        get(ActivityController::getActivitiesByUserId, Roles.USER, Roles.ADMIN)
-                        delete(ActivityController::deleteActivityByUserId, Roles.USER, Roles.ADMIN)
+                        get(ActivityController::getActivitiesByUserId, Roles.ADMIN)
+                        delete(ActivityController::deleteActivityByUserId, Roles.ADMIN)
                     }
                     path("goals"){
                         get(GoalController::getGoalsByUserId, Roles.USER, Roles.ADMIN)
@@ -111,9 +111,15 @@ class JavalinConfig() {
                     get(UserController::getUserByEmail, Roles.ADMIN)
                 }
             }
-            path("/api/user/"){
+            path("/api/user"){
                 get(UserController::getUserByToken, Roles.USER)
                 patch(UserController::updateUser, Roles.USER)
+                delete(UserController::deleteUser, Roles.USER)
+                path("activity"){
+                    get(ActivityController::getActivitiesByUserId, Roles.USER)
+                    post(ActivityController::addActivityByUserId, Roles.USER)
+                    delete(ActivityController::deleteActivityByUserId, Roles.USER)
+                }
             }
             path("/api/activities") {
                 get(ActivityController::getAllActivities, Roles.ADMIN)

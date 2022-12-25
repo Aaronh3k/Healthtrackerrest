@@ -45,10 +45,10 @@ class ActivityDAO {
                     it[duration] = activity.duration
                     it[calories] = activity.calories
                     it[started] = activity.started
-                    it[userId] = activity.userId
+                    it[userId] = activity.userId!!
                     it[categoryId] = activity.categoryId
                     it[distance] = activity.distance
-                    it[created_at] = activity.created_at
+                    it[created_at] = activity.created_at!!
                 }
             } get Activities.id
     }
@@ -62,10 +62,9 @@ class ActivityDAO {
                 it[duration] = activityDTO.duration
                 it[started] = activityDTO.started
                 it[calories] = activityDTO.calories
-                it[userId] = activityDTO.userId
+                it[userId] = activityDTO.userId!!
                 it[categoryId] = activityDTO.categoryId
                 it[distance] = activityDTO.distance
-                it[created_at] = activityDTO.created_at
             }
         }
         }catch (e: Exception){

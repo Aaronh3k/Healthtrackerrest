@@ -58,10 +58,26 @@ class UserDAO {
         }
     }
 
+    fun findUserIdByEmail(email: String): User?{
+        return transaction {
+            Users.select() {
+                Users.email eq email}
+                .map{mapToUser(it)}
+                .firstOrNull()
+        }
+    }
+
     fun delete(id: Int):Int{
         return transaction{
             Users.deleteWhere{
                 Users.id eq id
+            }
+        }
+    }
+    fun deletebyemail(email: String):Int{
+        return transaction{
+            Users.deleteWhere{
+                Users.email eq email
             }
         }
     }

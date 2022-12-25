@@ -132,10 +132,21 @@ object UserController {
         responses  = [OpenApiResponse("204")]
     )
     fun deleteUser(ctx: Context){
-        if (userDao.delete(ctx.pathParam("user-id").toInt()) != 0)
-            ctx.status(204)
+        var st = 0
+        if (ctx.pathParamMap().get("user-id") == null){
+            val email = ctx.attribute<String>("email")
+            if (email != null)
+                st = userDao.deletebyemail(email = email)
+        }
         else
-            ctx.status(404)
+            st= userDao.delete(ctx.pathParam("user-id").toInt())
+
+        if (st != 0){
+            ctx.json(mapOf("message" to "DELETED"))
+            ctx.status(200)}
+        else{
+            ctx.json(mapOf("message" to "DELETED"))
+            ctx.status(400)}
     }
 
     @OpenApi(
