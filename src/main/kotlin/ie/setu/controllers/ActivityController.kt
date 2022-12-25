@@ -7,6 +7,7 @@ import io.javalin.http.Context
 import io.javalin.plugin.openapi.annotations.*
 import org.joda.time.DateTime
 import ie.setu.domain.repository.UserDAO
+import kotlin.reflect.typeOf
 
 object ActivityController {
 
@@ -42,7 +43,7 @@ object ActivityController {
         responses  = [OpenApiResponse("200", [OpenApiContent(Activity::class)])]
     )
     fun getActivitiesByUserId(ctx: Context) {
-        if (ActivityController.userDao.findById(ctx.pathParam("user-id").toInt()) != null) {
+        if (ctx.pathParamMap().get("user-id") != null) {
             val activities = activityDAO.findByUserId(ctx.pathParam("user-id").toInt())
             if (activities.isNotEmpty()) {
                 ctx.json(activities)
@@ -53,7 +54,11 @@ object ActivityController {
             }
         }
         else{
-            ctx.status(404)
+            val email = ctx.attribute<String>("email")
+            if (email != null) {
+                val activities = userDao.findUserIdByEmail(email)?.id?.let { activityDAO.findByUserId(it) }
+            }
+            ctx.status(200)
         }
     }
     @OpenApi(
@@ -68,7 +73,7 @@ object ActivityController {
     fun addActivity(ctx: Context) {
         val activity : Activity = jsonToObject(ctx.body())
         activity.created_at = DateTime.now()
-        val userId = ActivityController.userDao.findById(activity.userId)
+        val userId = activity.userId?.let { ActivityController.userDao.findById(it) }
         if (userId != null) {
             val activityId = activityDAO.save(activity)
             activity.id = activityId
@@ -76,8 +81,23 @@ object ActivityController {
             ctx.status(201)
         }
         else{
-            ctx.status(404)
+            ctx.status(400)
         }
+    }
+
+    fun addActivityByUserId(ctx: Context) {
+        val activity : Activity = jsonToObject(ctx.body())
+        activity.created_at = DateTime.now()
+        val email = ctx.attribute<String>("email")
+        activity.userId = email?.let { userDao.findUserIdByEmail(it)?.id?.toInt() } ?: -1
+        if (activity.userId != -1){
+            val activityId = activityDAO.save(activity)
+            activity.id = activityId
+            ctx.json(activity)
+            ctx.status(201)
+            return
+        }
+        ctx.status(400)
     }
 
     @OpenApi(
