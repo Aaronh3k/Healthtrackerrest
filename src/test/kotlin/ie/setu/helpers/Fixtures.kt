@@ -69,9 +69,9 @@ val userprofile = arrayListOf<Profile>(
 fun populateUserTable(): UserDAO {
     SchemaUtils.create(Users)
     val userDAO = UserDAO()
-    userDAO.save(users[0])
-    userDAO.save(users[1])
-    userDAO.save(users[2])
+    userDAO.create(users[0])
+    userDAO.create(users[1])
+    userDAO.create(users[2])
     return userDAO
 }
 fun populateActivityTable(): ActivityDAO {

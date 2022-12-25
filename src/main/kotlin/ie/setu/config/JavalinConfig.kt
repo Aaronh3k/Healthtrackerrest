@@ -1,9 +1,14 @@
 package ie.setu.config
 
+import com.auth0.jwt.interfaces.DecodedJWT
 import ie.setu.controllers.*
+import ie.setu.domain.User
 import ie.setu.utils.jsonObjectMapper
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
+import io.javalin.core.security.RouteRole
+import io.javalin.http.Context
+import io.javalin.http.ForbiddenResponse
 import io.javalin.plugin.json.JavalinJackson
 import io.javalin.plugin.openapi.ui.SwaggerOptions
 import io.javalin.plugin.openapi.OpenApiOptions
@@ -11,8 +16,18 @@ import io.javalin.plugin.openapi.OpenApiPlugin
 import io.javalin.plugin.openapi.ui.ReDocOptions
 import io.javalin.plugin.rendering.vue.VueComponent
 import io.swagger.v3.oas.models.info.Info
+import ie.setu.utils.JwtProvider
+import javax.management.relation.Role
 
-class JavalinConfig {
+internal enum class Roles : RouteRole {
+    ANYONE, USER, ADMIN
+}
+
+private const val headerTokenName = "Authorization"
+
+private val jwtProvider = JwtProvider()
+class JavalinConfig() {
+
     fun startJavalinService(): Javalin {
         val app = Javalin.create {
             it.registerPlugin(getConfiguredOpenApiPlugin())
@@ -25,10 +40,20 @@ class JavalinConfig {
             error(404) { ctx -> ctx.json("404 - Not Found") }
         }.start(getRemoteAssignedPort())
 
+        configure(app)
         registerRoutes(app)
         return app
     }
 
+    private fun configure(app: Javalin) {
+        app._conf.accessManager { handler, ctx, permittedRoles ->
+            val jwtToken = getJwtTokenHeader(ctx)
+            val userRole = getUserRole(jwtToken) ?: Roles.ANYONE
+            permittedRoles.takeIf { !it.contains(userRole) }?.apply { throw ForbiddenResponse() }
+            ctx.attribute("email", getEmail(jwtToken))
+            handler.handle(ctx)
+        }
+    }
     private fun getRemoteAssignedPort(): Int {
         val herokuPort = System.getenv("PORT")
         return if (herokuPort != null) {
@@ -36,70 +61,94 @@ class JavalinConfig {
         } else 7000
     }
 
+    private fun getJwtTokenHeader(ctx: Context): DecodedJWT? {
+        val tokenHeader = ctx.header(headerTokenName)?.substringAfter("Token")?.trim()
+            ?: return null
+
+        return jwtProvider.decodeJWT(tokenHeader)
+    }
+
+    private fun getEmail(jwtToken: DecodedJWT?): String? {
+        return jwtToken?.subject
+    }
+
+    private fun getUserRole(jwtToken: DecodedJWT?): RouteRole? {
+        val userRole = jwtToken?.getClaim("role")?.asString() ?: return null
+        return Roles.valueOf(userRole)
+    }
     private fun registerRoutes(app: Javalin) {
         app.routes {
             get("/", VueComponent("<home-page></home-page>"))
             get("/users", VueComponent("<user-overview></user-overview>"))
             get("/users/{user-id}", VueComponent("<user-profile></user-profile>"))
             get("/users/{user-id}/activities", VueComponent("<user-activity-overview></user-activity-overview>"))
+            path("/api/register"){
+                post(UserController::registerUser, Roles.ANYONE)
+            }
+            path("/api/login"){
+                post(UserController::loginUser, Roles.ANYONE)
+            }
             path("/api/users") {
-                get(UserController::getAllUsers)
-                post(UserController::addUser)
+                get(UserController::getAllUsers, Roles.ADMIN)
                 path("{user-id}"){
-                    get(UserController::getUserByUserId)
-                    delete(UserController::deleteUser)
-                    patch(UserController::updateUser)
+                    get(UserController::getUserByUserId, Roles.USER, Roles.ADMIN)
+                    delete(UserController::deleteUser, Roles.ADMIN)
+                    patch(UserController::updateUser, Roles.USER, Roles.ADMIN)
                     path("activities"){
-                        get(ActivityController::getActivitiesByUserId)
-                        delete(ActivityController::deleteActivityByUserId)
+                        get(ActivityController::getActivitiesByUserId, Roles.USER, Roles.ADMIN)
+                        delete(ActivityController::deleteActivityByUserId, Roles.USER, Roles.ADMIN)
                     }
                     path("goals"){
-                        get(GoalController::getGoalsByUserId)
-                        delete(GoalController::deleteGoalByUserId)
+                        get(GoalController::getGoalsByUserId, Roles.USER, Roles.ADMIN)
+                        delete(GoalController::deleteGoalByUserId, Roles.USER, Roles.ADMIN)
                     }
                     path("userprofile"){
-                        get(ProfileController::getUserProfileByUserId)
-                        delete(ProfileController::deleteProfileByUserId)
+                        get(ProfileController::getUserProfileByUserId, Roles.USER, Roles.ADMIN)
+                        delete(ProfileController::deleteProfileByUserId, Roles.ADMIN)
                     }
                 }
                 path("/email/{email}"){
-                    get(UserController::getUserByEmail)
+                    get(UserController::getUserByEmail, Roles.ADMIN)
                 }
             }
+            path("/api/user/"){
+                get(UserController::getUserByToken, Roles.USER)
+                patch(UserController::updateUser, Roles.USER)
+            }
             path("/api/activities") {
-                get(ActivityController::getAllActivities)
-                post(ActivityController::addActivity)
+                get(ActivityController::getAllActivities, Roles.ADMIN)
+                post(ActivityController::addActivity, Roles.USER, Roles.ADMIN)
                 path("{activity-id}") {
-                    get(ActivityController::getActivitiesByActivityId)
-                    delete(ActivityController::deleteActivityByActivityId)
-                    patch(ActivityController::updateActivity)
+                    get(ActivityController::getActivitiesByActivityId, Roles.USER, Roles.ADMIN)
+                    delete(ActivityController::deleteActivityByActivityId, Roles.USER, Roles.ADMIN)
+                    patch(ActivityController::updateActivity, Roles.USER, Roles.ADMIN)
                 }
             }
             path("/api/categories"){
-                get(CategoryController::getAllCategories)
-                post(CategoryController::addCategories)
+                get(CategoryController::getAllCategories, Roles.USER, Roles.ADMIN)
+                post(CategoryController::addCategories, Roles.ADMIN)
                 path("{category-id}") {
-                    get(CategoryController::getCategoriesByCategoryId)
-                    delete(CategoryController::deleteCategoryByCategoryId)
-                    patch(CategoryController::updateCategoryByCategoryId)
+                    get(CategoryController::getCategoriesByCategoryId, Roles.USER, Roles.ADMIN)
+                    delete(CategoryController::deleteCategoryByCategoryId, Roles.ADMIN)
+                    patch(CategoryController::updateCategoryByCategoryId, Roles.ADMIN)
                 }
             }
             path("/api/goals"){
-                get(GoalController::getAllGoals)
-                post(GoalController::addGoals)
+                get(GoalController::getAllGoals, Roles.ADMIN)
+                post(GoalController::addGoals, Roles.USER, Roles.ADMIN)
                 path("{goal-id}") {
-                    get(GoalController::getGoalsByGoalId)
-                    delete(GoalController::deleteGoalByGoalId)
-                    patch(GoalController::updateGoalByGoalId)
+                    get(GoalController::getGoalsByGoalId, Roles.USER, Roles.ADMIN)
+                    delete(GoalController::deleteGoalByGoalId, Roles.USER, Roles.ADMIN)
+                    patch(GoalController::updateGoalByGoalId, Roles.USER, Roles.ADMIN)
                 }
             }
             path("/api/profile"){
-                get(ProfileController::getAllUserProfile)
-                post(ProfileController::addUserProfile)
+                get(ProfileController::getAllUserProfile, Roles.ADMIN)
+                post(ProfileController::addUserProfile, Roles.USER, Roles.ADMIN)
                 path("{profile-id}") {
-                    get(ProfileController::getUserProfileByProfileId)
-                    delete(ProfileController::deleteProfileByProfileId)
-                    patch(ProfileController::updateProfileByProfileId)
+                    get(ProfileController::getUserProfileByProfileId, Roles.USER, Roles.ADMIN)
+                    delete(ProfileController::deleteProfileByProfileId, Roles.ADMIN)
+                    patch(ProfileController::updateProfileByProfileId, Roles.USER, Roles.ADMIN)
                 }
             }
 

@@ -7,7 +7,9 @@ import org.jetbrains.exposed.sql.ResultRow
 fun mapToUser(it: ResultRow) = User(
     id = it[Users.id],
     user_name = it[Users.user_name],
-    email = it[Users.email]
+    email = it[Users.email],
+    token = it[Users.token],
+    password = it[Users.password]
 )
 fun mapToActivity(it: ResultRow) = Activity(
         id = it[Activities.id],

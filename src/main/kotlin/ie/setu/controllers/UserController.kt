@@ -4,11 +4,17 @@ import ie.setu.domain.*
 import ie.setu.domain.repository.UserDAO
 import ie.setu.utils.jsonToObject
 import io.javalin.http.Context
+import io.javalin.http.HttpResponseException
 import io.javalin.plugin.openapi.annotations.*
+import org.eclipse.jetty.http.HttpStatus
+import java.util.*
+import ie.setu.utils.Cipher
+import io.javalin.http.UnauthorizedResponse
 
 object UserController {
 
     private val userDao = UserDAO()
+    private val base64Encoder = Base64.getEncoder()
 
     @OpenApi(
         summary = "Get all users",
@@ -49,6 +55,18 @@ object UserController {
         }
     }
 
+    fun getUserByToken(ctx: Context) {
+        val email = ctx.attribute<String>("email")
+        val user = email?.let { userDao.findByEmail(it) }
+        if (user != null) {
+            ctx.json(user)
+            ctx.status(200)
+        }
+        else{
+            ctx.status(404)
+        }
+    }
+
     @OpenApi(
         summary = "Add User",
         operationId = "addUser",
@@ -58,11 +76,17 @@ object UserController {
         pathParams = [OpenApiParam("user-id", Int::class, "The user ID")],
         responses  = [OpenApiResponse("200")]
     )
-    fun addUser(ctx: Context) {
+    fun registerUser(ctx: Context) {
         val user : User = jsonToObject(ctx.body())
-        val userId = userDao.save(user)
+        userDao.findByEmail(user.email).takeIf { it != null }?.apply {
+            throw HttpResponseException(
+                HttpStatus.BAD_REQUEST_400,
+                "Email already registered!")
+        }
+        val userId = userDao.create(user.copy(password = String(base64Encoder.encode(Cipher.encrypt(user.password)))))
         if (userId != null && userId != 0) {
             user.id = userId
+            user.token = user.copy(token = userDao.generateJwtToken(user)).token.toString()
             ctx.json(user)
             ctx.status(201)
         }
@@ -70,7 +94,14 @@ object UserController {
             ctx.status(400)
         }
     }
-
+    fun loginUser(ctx: Context){
+        val user : User = jsonToObject(ctx.body())
+        val userfound = userDao.findByEmail(user.email)
+        if (userfound?.password == String(base64Encoder.encode(Cipher.encrypt(user?.password)))) {
+            val token = mapOf("key" to user.copy(token = userDao.generateJwtToken(user)).token.toString())
+            ctx.json(token)
+        }else throw UnauthorizedResponse("email or password invalid!")
+    }
     @OpenApi(
         summary = "Get user by Email",
         operationId = "getUserByEmail",
@@ -118,9 +149,20 @@ object UserController {
     )
     fun updateUser(ctx: Context){
         val foundUser : User = jsonToObject(ctx.body())
-        if ((userDao.update(id = ctx.pathParam("user-id").toInt(), user=foundUser)) != 0)
-            ctx.status(204)
-        else
-            ctx.status(404)
-    }
+        var st = 0
+        if (ctx.pathParamMap().get("user-id") == null){
+            val email = ctx.attribute<String>("email")
+            if (email != null)
+                st = userDao.updatebyemail(Email = email, user=foundUser)
+            }
+            else
+                st = userDao.update(id = ctx.pathParam("user-id").toInt(), user=foundUser)
+
+        if (st != 0){
+            ctx.json(mapOf("message" to "UPDATED"))
+            ctx.status(200)}
+        else{
+            ctx.json(mapOf("message" to "NOT UPDATED"))
+            ctx.status(400)}
+        }
 }
