@@ -20,7 +20,7 @@ Vue.component("user-overview", {
   },
   methods: {
     fetchUsers: function () {
-      axios.get("/api/users")
+      axios.get("/api/ui/users")
           .then(res => this.users = res.data)
           .catch(() => alert("Error while fetching users"));
     }

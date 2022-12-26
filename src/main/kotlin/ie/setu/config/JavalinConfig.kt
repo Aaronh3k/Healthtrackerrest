@@ -17,7 +17,6 @@ import io.javalin.plugin.openapi.ui.ReDocOptions
 import io.javalin.plugin.rendering.vue.VueComponent
 import io.swagger.v3.oas.models.info.Info
 import ie.setu.utils.JwtProvider
-import javax.management.relation.Role
 
 internal enum class Roles : RouteRole {
     ANYONE, USER, ADMIN
@@ -30,6 +29,7 @@ class JavalinConfig() {
 
     fun startJavalinService(): Javalin {
         val app = Javalin.create {
+            it.enableCorsForAllOrigins()
             it.registerPlugin(getConfiguredOpenApiPlugin())
             it.defaultContentType = "application/json"
             //added this jsonMapper for our integration tests - serialise objects to json
@@ -78,10 +78,6 @@ class JavalinConfig() {
     }
     private fun registerRoutes(app: Javalin) {
         app.routes {
-            get("/", VueComponent("<home-page></home-page>"))
-            get("/users", VueComponent("<user-overview></user-overview>"))
-            get("/users/{user-id}", VueComponent("<user-profile></user-profile>"))
-            get("/users/{user-id}/activities", VueComponent("<user-activity-overview></user-activity-overview>"))
             path("/api/register"){
                 post(UserController::registerUser, Roles.ANYONE)
             }
@@ -122,7 +118,7 @@ class JavalinConfig() {
                 }
             }
             path("/api/activities") {
-                get(ActivityController::getAllActivities, Roles.ADMIN)
+                get(ActivityController::getAllActivities, Roles.ANYONE, Roles.ADMIN)
                 post(ActivityController::addActivity, Roles.USER, Roles.ADMIN)
                 path("{activity-id}") {
                     get(ActivityController::getActivitiesByActivityId, Roles.USER, Roles.ADMIN)
@@ -157,6 +153,47 @@ class JavalinConfig() {
                     patch(ProfileController::updateProfileByProfileId, Roles.USER, Roles.ADMIN)
                 }
             }
+
+            get("/", VueComponent("<home-page></home-page>"), Roles.ANYONE)
+            get("/users", VueComponent("<user-overview></user-overview>"), Roles.ANYONE)
+            get("/users/{user-id}", VueComponent("<user-profile></user-profile>"), Roles.ANYONE)
+            get("/activities", VueComponent("<activities-overview></activities-overview>"), Roles.ANYONE)
+            get("/activities/{activity-id}", VueComponent("<activities-profile></activities-profile>"), Roles.ANYONE)
+            get("/users/{user-id}/activities", VueComponent("<user-activity-overview></user-activity-overview>"), Roles.ANYONE)
+
+            path("/api/ui/users") {
+                get(UserController::getAllUsers, Roles.ANYONE)
+                path("{user-id}"){
+                    get(UserController::getUserByUserId, Roles.ANYONE)
+                    delete(UserController::deleteUser, Roles.ANYONE)
+                    patch(UserController::updateUser, Roles.ANYONE)
+                    path("activities"){
+                        get(ActivityController::getActivitiesByUserId, Roles.ANYONE)
+                        delete(ActivityController::deleteActivityByUserId, Roles.ANYONE)
+                    }
+                    path("goals"){
+                        get(GoalController::getGoalsByUserId, Roles.ANYONE)
+                        delete(GoalController::deleteGoalByUserId, Roles.ANYONE)
+                    }
+                    path("userprofile"){
+                        get(ProfileController::getUserProfileByUserId, Roles.ANYONE)
+                        delete(ProfileController::deleteProfileByUserId, Roles.ANYONE)
+                    }
+                }
+                path("/email/{email}"){
+                    get(UserController::getUserByEmail, Roles.ANYONE)
+                }
+            }
+            path("/api/ui/activities") {
+                get(ActivityController::getAllActivities, Roles.ANYONE)
+                post(ActivityController::addActivity, Roles.ANYONE)
+                path("{activity-id}") {
+                    get(ActivityController::getActivitiesByActivityId, Roles.ANYONE)
+                    delete(ActivityController::deleteActivityByActivityId, Roles.ANYONE)
+                    patch(ActivityController::updateActivity, Roles.ANYONE)
+                }
+            }
+
 
             }
         }

@@ -31,7 +31,7 @@ Vue.component("user-profile", {
   }),
   created: function () {
     const userId = this.$javalin.pathParams["user-id"];
-    const url = `/api/users/${userId}`
+    const url = `/api/ui/users/${userId}`
     axios.get(url)
         .then(res => this.user = res.data)
         .catch(() => alert("Error while fetching user" + userId));

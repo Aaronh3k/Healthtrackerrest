@@ -43,7 +43,7 @@ class UserDAO {
     }
 
     fun generateJwtToken(user: User): String? {
-        return if (user.email == "admin@healthtracker.com")
+        return if (user.role == "ROLE_ADMIN")
             jwtProvider.createJWT(user, Roles.ADMIN)
         else
             jwtProvider.createJWT(user, Roles.USER)

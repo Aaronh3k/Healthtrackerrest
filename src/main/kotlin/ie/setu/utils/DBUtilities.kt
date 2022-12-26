@@ -9,7 +9,8 @@ fun mapToUser(it: ResultRow) = User(
     user_name = it[Users.user_name],
     email = it[Users.email],
     token = it[Users.token],
-    password = it[Users.password]
+    password = it[Users.password],
+    role = it[Users.role]
 )
 fun mapToActivity(it: ResultRow) = Activity(
         id = it[Activities.id],
