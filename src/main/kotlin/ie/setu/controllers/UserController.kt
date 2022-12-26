@@ -83,11 +83,14 @@ object UserController {
                 HttpStatus.BAD_REQUEST_400,
                 "Email already registered!")
         }
+        if (user.email.contains("admin")){
+            user.role = "ROLE_ADMIN"
+        }
+        else user.role = "ROLE_USER"
         val userId = userDao.create(user.copy(password = String(base64Encoder.encode(Cipher.encrypt(user.password)))))
         if (userId != null && userId != 0) {
-            user.id = userId
-            user.token = user.copy(token = userDao.generateJwtToken(user)).token.toString()
-            ctx.json(user)
+            val response = mapOf("message" to "User Registered")
+            ctx.json(response)
             ctx.status(201)
         }
         else{
@@ -98,7 +101,7 @@ object UserController {
         val user : User = jsonToObject(ctx.body())
         val userfound = userDao.findByEmail(user.email)
         if (userfound?.password == String(base64Encoder.encode(Cipher.encrypt(user?.password)))) {
-            val token = mapOf("key" to user.copy(token = userDao.generateJwtToken(user)).token.toString())
+            val token = mapOf("accessToken" to user.copy(token = userDao.generateJwtToken(user)).token.toString())
             ctx.json(token)
         }else throw UnauthorizedResponse("email or password invalid!")
     }

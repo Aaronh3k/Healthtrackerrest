@@ -8,4 +8,5 @@ object Users : Table("users") {
     val email = varchar("email", 255).uniqueIndex()
     val token = varchar("token", 255)
     val password = varchar("password", 255)
+    val role = varchar("role", 15)
 }

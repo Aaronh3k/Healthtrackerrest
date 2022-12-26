@@ -33,10 +33,10 @@ Vue.component('home-page',
         activities: []
       }),
       created() {
-        axios.get("/api/users")
+        axios.get("/api/ui/users")
             .then(res => this.users = res.data)
             .catch(() => alert("Error while fetching users"));
-        axios.get("/api/activities")
+        axios.get("/api/ui/activities")
             .then(res => this.activities = res.data)
             .catch(() => alert("Error while fetching activities"));
       }
