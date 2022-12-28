@@ -3,10 +3,10 @@ package ie.setu.domain
 import org.joda.time.DateTime
 
 data class Profile(
-    var id: Int,
+    var id: Int? = null,
     var userId: Int,
-    var first_name: String,
-    var last_name: String,
-    var dob: DateTime,
-    var gender: Char,
-    var created_at: DateTime)
+    var first_name: String? = null,
+    var last_name: String? = null,
+    var dob: DateTime? = null,
+    var gender: Char? = null,
+    var created_at: DateTime? = null)

@@ -36,12 +36,12 @@ class ProfileDAO {
     fun save(profile: Profile): Int {
         return try { transaction {
             UserProfiles.insert {
-                it[userId] = profile.userId
-                it[first_name] = profile.first_name
-                it[last_name] = profile.last_name
-                it[dob] = profile.dob
-                it[gender] = profile.gender
-                it[created_at] = profile.created_at
+                it[userId] = profile.userId!!
+                it[first_name] = profile.first_name!!
+                it[last_name] = profile.last_name!!
+                it[dob] = profile.dob!!
+                it[gender] = profile.gender!!
+                it[created_at] = profile.created_at!!
             }
         } get UserProfiles.id
     }catch (e: Exception){
@@ -54,12 +54,10 @@ class ProfileDAO {
             transaction {
                 UserProfiles.update ({
                     UserProfiles.id eq profileId}) {
-                    it[userId] = profileDTO.userId
-                    it[first_name] = profileDTO.first_name
-                    it[last_name] = profileDTO.last_name
-                    it[dob] = profileDTO.dob
-                    it[gender] = profileDTO.gender
-                    it[created_at] = profileDTO.created_at
+                    it[first_name] = profileDTO.first_name!!
+                    it[last_name] = profileDTO.last_name!!
+                    it[dob] = profileDTO.dob!!
+                    it[gender] = profileDTO.gender!!
                 }
             }
         }catch (e: Exception){
@@ -73,11 +71,12 @@ class ProfileDAO {
     }
 
     //Find all profiles for a specific user id
-    fun findByUserId(userId: Int): List<Profile?> {
+    fun findByUserId(userId: Int): Profile? {
         return transaction {
             UserProfiles
                 .select { UserProfiles.userId eq userId}
                 .map { mapToProfile(it) }
+                .firstOrNull()
         }
     }
 

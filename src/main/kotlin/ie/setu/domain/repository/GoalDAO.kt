@@ -50,7 +50,7 @@ class GoalDAO {
                 it[standing_hours] = Goal.standing_hours
                 it[steps] = Goal.steps
                 it[distance] = Goal.distance
-                it[created_at] = Goal.created_at
+                it[created_at] = Goal.created_at!!
             }
         } get Goals.id
     }
@@ -65,7 +65,7 @@ class GoalDAO {
                     it[standing_hours] = goalDTO.standing_hours
                     it[steps] = goalDTO.steps
                     it[distance] = goalDTO.distance
-                    it[created_at] = goalDTO.created_at
+                    it[created_at] = goalDTO.created_at!!
                 }
             }
         }catch (e: Exception){

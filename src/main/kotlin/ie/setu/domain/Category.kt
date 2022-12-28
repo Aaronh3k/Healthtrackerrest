@@ -2,7 +2,7 @@ package ie.setu.domain
 
 import org.joda.time.DateTime
 
-data class Category (var id: Int,
+data class Category (var id: Int? = null,
                  var name: String,
-                 var description: String,
-                 var created_at: DateTime)
+                 var description: String? = null,
+                 var created_at: DateTime? = null)

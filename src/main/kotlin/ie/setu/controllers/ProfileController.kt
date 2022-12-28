@@ -11,7 +11,7 @@ import org.joda.time.DateTime
 
 object ProfileController {
 
-    private val profileDAO = ProfileDAO()
+    val profileDAO = ProfileDAO()
 
     @OpenApi(
         summary = "Get all UserProfile",
@@ -22,14 +22,16 @@ object ProfileController {
         responses = [OpenApiResponse("200", [OpenApiContent(Array<Profile>::class)])]
     )
     fun getAllUserProfile(ctx: Context) {
-        val userprofile = ProfileController.profileDAO.getAll()
+        val userprofile = profileDAO.getAll()
         if (userprofile.size != 0) {
+            ctx.json(userprofile)
             ctx.status(200)
         }
         else{
-            ctx.status(404)
+            val arr = arrayOf<Int>()
+            ctx.json(arr)
+            ctx.status(204)
         }
-        ctx.json(userprofile)
     }
 
 
@@ -65,18 +67,18 @@ object ProfileController {
     fun addUserProfile(ctx: Context) {
         val userprofile : Profile = jsonToObject(ctx.body())
         userprofile.created_at = DateTime.now()
-        val userId = ProfileController.profileDAO.findByUserId(userprofile.userId)
-        if (userId != null)
+        val user = UserController.userDao.findById(userprofile.userId)
+        if (user == null)
             ctx.status(204)
         else{
-            val profileId = ProfileController.profileDAO.save(userprofile)
+            val profileId = profileDAO.save(userprofile)
             if (profileId != 0) {
                 userprofile.id = profileId
                 ctx.json(userprofile)
                 ctx.status(201)
             }
             else{
-                ctx.status(404)
+                ctx.status(204)
             }
         }}
 
@@ -123,23 +125,11 @@ object ProfileController {
     )
     fun updateProfileByProfileId(ctx: Context){
         val profile : Profile = jsonToObject(ctx.body())
-        val userId = ProfileController.profileDAO.findByUserId(profile.userId)
-        if (userId != null)
+        if (profileDAO.updateByProfileId(profileId = ctx.pathParam("profile-id").toInt(), profileDTO =profile) != 0)
+            ctx.status(201)
+        else
             ctx.status(204)
-        else{
-            val userprofile = ProfileController.profileDAO.findByProfileId(ctx.pathParam("profile-id").toInt())
-            if (userprofile != null) {
-                profile.created_at = userprofile.created_at
-            }
-            else{
-                ctx.status(404)
-            }
-
-            if (ProfileController.profileDAO.updateByProfileId(profileId = ctx.pathParam("profile-id").toInt(), profileDTO =profile) != 0)
-                ctx.status(204)
-            else
-                ctx.status(404)
-        }}
+        }
 
     @OpenApi(
         summary = "Get profile by user ID",
@@ -153,12 +143,12 @@ object ProfileController {
     fun getUserProfileByUserId(ctx: Context) {
         if (ProfileController.profileDAO.findByUserId(ctx.pathParam("user-id").toInt()) != null) {
             val userprofile = ProfileController.profileDAO.findByUserId(ctx.pathParam("user-id").toInt())
-            if (userprofile.isNotEmpty()) {
-                ctx.json(userprofile)
-                ctx.status(200)
-            }
-            else{
-                ctx.status(404)
+                if (userprofile != null) {
+                    ctx.json(userprofile)
+                    ctx.status(200)
+                }
+                else{
+                    ctx.status(204)
             }
         }
         else{
@@ -180,6 +170,4 @@ object ProfileController {
         else
             ctx.status(404)
     }
-
-
 }

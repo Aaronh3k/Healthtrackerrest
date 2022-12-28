@@ -17,6 +17,7 @@ import io.javalin.plugin.openapi.ui.ReDocOptions
 import io.javalin.plugin.rendering.vue.VueComponent
 import io.swagger.v3.oas.models.info.Info
 import ie.setu.utils.JwtProvider
+import javax.management.relation.Role
 
 internal enum class Roles : RouteRole {
     ANYONE, USER, ADMIN
@@ -99,7 +100,7 @@ class JavalinConfig() {
                         delete(GoalController::deleteGoalByUserId, Roles.USER, Roles.ADMIN)
                     }
                     path("userprofile"){
-                        get(ProfileController::getUserProfileByUserId, Roles.USER, Roles.ADMIN)
+                        get(ProfileController::getUserProfileByUserId, Roles.ADMIN)
                         delete(ProfileController::deleteProfileByUserId, Roles.ADMIN)
                     }
                 }
@@ -108,13 +109,13 @@ class JavalinConfig() {
                 }
             }
             path("/api/user"){
-                get(UserController::getUserByToken, Roles.USER)
-                patch(UserController::updateUser, Roles.USER)
-                delete(UserController::deleteUser, Roles.USER)
+                get(UserController::getUserByToken, Roles.USER, Roles.ADMIN)
+                patch(UserController::updateUser, Roles.USER, Roles.ADMIN)
+                delete(UserController::deleteUser, Roles.USER, Roles.ADMIN)
                 path("activity"){
-                    get(ActivityController::getActivitiesByUserId, Roles.USER)
-                    post(ActivityController::addActivityByUserId, Roles.USER)
-                    delete(ActivityController::deleteActivityByUserId, Roles.USER)
+                    get(ActivityController::getActivitiesByUserId, Roles.USER, Roles.ADMIN)
+                    post(ActivityController::addActivityByUserId, Roles.USER, Roles.ADMIN)
+                    delete(ActivityController::deleteActivityByUserId, Roles.USER, Roles.ADMIN)
                 }
             }
             path("/api/activities") {

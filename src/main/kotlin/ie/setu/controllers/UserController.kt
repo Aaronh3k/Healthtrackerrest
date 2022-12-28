@@ -13,7 +13,7 @@ import io.javalin.http.UnauthorizedResponse
 
 object UserController {
 
-    private val userDao = UserDAO()
+    val userDao = UserDAO()
     private val base64Encoder = Base64.getEncoder()
 
     @OpenApi(
@@ -27,12 +27,14 @@ object UserController {
     fun getAllUsers(ctx: Context) {
         val users = userDao.getAll()
         if (users.size != 0) {
+            ctx.json(users)
             ctx.status(200)
         }
         else{
-            ctx.status(404)
+            val arr = arrayOf<Int>()
+            ctx.json(arr)
+            ctx.status(204)
         }
-        ctx.json(users)
     }
 
     @OpenApi(
@@ -101,7 +103,9 @@ object UserController {
         val user : User = jsonToObject(ctx.body())
         val userfound = userDao.findByEmail(user.email)
         if (userfound?.password == String(base64Encoder.encode(Cipher.encrypt(user?.password)))) {
-            val token = mapOf("accessToken" to user.copy(token = userDao.generateJwtToken(user)).token.toString())
+            val token = mapOf("accessToken" to user.copy(token = userDao.generateJwtToken(user, userfound)).token.toString(),
+                              "role" to userfound.role,
+                              "user_name" to userfound.user_name)
             ctx.json(token)
         }else throw UnauthorizedResponse("email or password invalid!")
     }
