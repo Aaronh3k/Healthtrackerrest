@@ -25,12 +25,14 @@ object ActivityController {
     fun getAllActivities(ctx: Context) {
         val activities = activityDAO.getAll()
         if (activities.size != 0) {
+            ctx.json(activities)
             ctx.status(200)
         }
         else{
-            ctx.status(404)
+            val arr = arrayOf<Int>()
+            ctx.json(arr)
+            ctx.status(204)
         }
-        ctx.json(activities)
     }
 
     @OpenApi(

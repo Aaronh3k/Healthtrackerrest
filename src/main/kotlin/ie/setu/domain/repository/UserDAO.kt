@@ -38,12 +38,13 @@ class UserDAO {
                 row[Users.email] = user.email
                 row[Users.user_name] = user.user_name!!
                 row[Users.password] = user.password!!
+                row[Users.role] = user.role!!
             } get Users.id
         }
     }
 
-    fun generateJwtToken(user: User): String? {
-        return if (user.role == "ROLE_ADMIN")
+    fun generateJwtToken(user: User, userfound: User): String? {
+        return if (userfound.role == "ROLE_ADMIN")
             jwtProvider.createJWT(user, Roles.ADMIN)
         else
             jwtProvider.createJWT(user, Roles.USER)

@@ -22,12 +22,14 @@ object CategoryController {
     fun getAllCategories(ctx: Context) {
         val categories = CategoryController.categoryDAO.getAll()
         if (categories.size != 0) {
+            ctx.json(categories)
             ctx.status(200)
         }
         else{
-            ctx.status(404)
+            val arr = arrayOf<Int>()
+            ctx.json(arr)
+            ctx.status(204)
         }
-        ctx.json(categories)
     }
 
     @OpenApi(
@@ -117,7 +119,7 @@ object CategoryController {
     )
     fun updateCategoryByCategoryId(ctx: Context){
         val category : Category = jsonToObject(ctx.body())
-        val categories = CategoryController.categoryDAO.findByCategoryId(ctx.pathParam("category-id").toInt())
+        val categories = categoryDAO.findByCategoryId(ctx.pathParam("category-id").toInt())
         if (categories != null) {
             category.created_at = categories.created_at
         }
@@ -125,7 +127,7 @@ object CategoryController {
             ctx.status(404)
         }
 
-        if (CategoryController.categoryDAO.updateByCategoryId(categoryId = ctx.pathParam("category-id").toInt(), categoryDTO =category) != 0)
+        if (categoryDAO.updateByCategoryId(categoryId = ctx.pathParam("category-id").toInt(), categoryDTO =category) != 0)
             ctx.status(204)
         else
             ctx.status(404)

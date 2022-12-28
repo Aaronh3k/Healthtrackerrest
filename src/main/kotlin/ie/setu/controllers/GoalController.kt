@@ -25,12 +25,14 @@ object GoalController {
     fun getAllGoals(ctx: Context) {
         val goals = GoalController.goalDAO.getAll()
         if (goals.size != 0) {
+            ctx.json(goals)
             ctx.status(200)
         }
         else{
-            ctx.status(404)
+            val arr = arrayOf<Int>()
+            ctx.json(arr)
+            ctx.status(204)
         }
-        ctx.json(goals)
     }
 
     @OpenApi(

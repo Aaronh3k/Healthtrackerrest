@@ -33,8 +33,8 @@ class CategoryDAO {
         return transaction {
             Categories.insert {
                 it[name] = Category.name
-                it[description] = Category.description
-                it[created_at] = Category.created_at
+                it[description] = Category.description!!
+                it[created_at] = Category.created_at!!
             }
         } get Categories.id
     }
@@ -45,8 +45,8 @@ class CategoryDAO {
                 Categories.update ({
                     Categories.id eq categoryId}) {
                     it[name] = categoryDTO.name
-                    it[description] = categoryDTO.description
-                    it[created_at] = categoryDTO.created_at
+                    it[description] = categoryDTO.description!!
+                    it[created_at] = categoryDTO.created_at!!
                 }
             }
         }catch (e: Exception){
