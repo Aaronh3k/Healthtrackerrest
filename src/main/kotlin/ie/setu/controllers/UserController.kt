@@ -105,7 +105,8 @@ object UserController {
         if (userfound?.password == String(base64Encoder.encode(Cipher.encrypt(user?.password)))) {
             val token = mapOf("accessToken" to user.copy(token = userDao.generateJwtToken(user, userfound)).token.toString(),
                               "role" to userfound.role,
-                              "user_name" to userfound.user_name)
+                              "user_name" to userfound.user_name,
+                              "Id" to userfound.id)
             ctx.json(token)
         }else throw UnauthorizedResponse("email or password invalid!")
     }

@@ -113,9 +113,12 @@ class JavalinConfig() {
                 patch(UserController::updateUser, Roles.USER, Roles.ADMIN)
                 delete(UserController::deleteUser, Roles.USER, Roles.ADMIN)
                 path("activity"){
-                    get(ActivityController::getActivitiesByUserId, Roles.USER, Roles.ADMIN)
-                    post(ActivityController::addActivityByUserId, Roles.USER, Roles.ADMIN)
-                    delete(ActivityController::deleteActivityByUserId, Roles.USER, Roles.ADMIN)
+                    get(ActivityController::getActivitiesByUserId, Roles.USER)
+                    post(ActivityController::addActivityByUserId, Roles.USER)
+                    delete(ActivityController::deleteActivityByUserId, Roles.USER)
+                }
+                path("goal"){
+                    get(GoalController::getGoalsByUserId, Roles.USER)
                 }
             }
             path("/api/activities") {
@@ -129,7 +132,7 @@ class JavalinConfig() {
             }
             path("/api/categories"){
                 get(CategoryController::getAllCategories, Roles.USER, Roles.ADMIN)
-                post(CategoryController::addCategories, Roles.ADMIN)
+                post(CategoryController::addCategories, Roles.USER, Roles.ADMIN)
                 path("{category-id}") {
                     get(CategoryController::getCategoriesByCategoryId, Roles.USER, Roles.ADMIN)
                     delete(CategoryController::deleteCategoryByCategoryId, Roles.ADMIN)
@@ -153,7 +156,7 @@ class JavalinConfig() {
                     delete(ProfileController::deleteProfileByProfileId, Roles.ADMIN)
                     patch(ProfileController::updateProfile, Roles.USER, Roles.ADMIN)
                 }
-            }//getProfileByToken
+            }
             path("/api/user-profile"){
                 get(ProfileController::getProfileByToken, Roles.USER, Roles.ADMIN)
                 patch(ProfileController::updateProfile, Roles.USER, Roles.ADMIN)
