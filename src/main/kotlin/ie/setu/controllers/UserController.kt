@@ -53,7 +53,7 @@ object UserController {
             ctx.status(200)
         }
         else{
-            ctx.status(404)
+            ctx.status(204)
         }
     }
 
@@ -69,15 +69,15 @@ object UserController {
         }
     }
 
-    @OpenApi(
-        summary = "Add User",
-        operationId = "addUser",
-        tags = ["User"],
-        path = "/api/users",
-        method = HttpMethod.POST,
-        pathParams = [OpenApiParam("user-id", Int::class, "The user ID")],
-        responses  = [OpenApiResponse("200")]
-    )
+//    @OpenApi(
+//        summary = "Add User",
+//        operationId = "addUser",
+//        tags = ["User"],
+//        path = "/api/users",
+//        method = HttpMethod.POST,
+//        pathParams = [OpenApiParam("user-id", Int::class, "The user ID")],
+//        responses  = [OpenApiResponse("200")]
+//    )
     fun registerUser(ctx: Context) {
         val user : User = jsonToObject(ctx.body())
         userDao.findByEmail(user.email).takeIf { it != null }?.apply {
@@ -85,7 +85,7 @@ object UserController {
                 HttpStatus.BAD_REQUEST_400,
                 "Email already registered!")
         }
-        if (user.email.contains("admin")){
+        if (user.email.contains("admin") ){
             user.role = "ROLE_ADMIN"
         }
         else user.role = "ROLE_USER"
@@ -109,6 +109,28 @@ object UserController {
                               "Id" to userfound.id)
             ctx.json(token)
         }else throw UnauthorizedResponse("email or password invalid!")
+    }
+
+    @OpenApi(
+        summary = "Add User",
+        operationId = "addUser",
+        tags = ["User"],
+        path = "/api/users",
+        method = HttpMethod.POST,
+        pathParams = [OpenApiParam("user-id", Int::class, "The user ID")],
+        responses  = [OpenApiResponse("200")]
+    )
+    fun addUser(ctx: Context) {
+        val user : User = jsonToObject(ctx.body())
+        val userId = userDao.save(user)
+        if (userId != null && userId != 0) {
+            user.id = userId
+            ctx.json(user)
+            ctx.status(201)
+        }
+        else{
+            ctx.status(400)
+        }
     }
     @OpenApi(
         summary = "Get user by Email",

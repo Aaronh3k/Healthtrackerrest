@@ -168,17 +168,9 @@ class JavalinConfig() {
 //                }
             }
 
-
-
-            get("/", VueComponent("<home-page></home-page>"), Roles.ANYONE)
-            get("/users", VueComponent("<user-overview></user-overview>"), Roles.ANYONE)
-            get("/users/{user-id}", VueComponent("<user-profile></user-profile>"), Roles.ANYONE)
-            get("/activities", VueComponent("<activities-overview></activities-overview>"), Roles.ANYONE)
-            get("/activities/{activity-id}", VueComponent("<activities-profile></activities-profile>"), Roles.ANYONE)
-            get("/users/{user-id}/activities", VueComponent("<user-activity-overview></user-activity-overview>"), Roles.ANYONE)
-
-            path("/api/ui/users") {
+            path("/test/users") {
                 get(UserController::getAllUsers, Roles.ANYONE)
+                post(UserController::addUser, Roles.ANYONE)
                 path("{user-id}"){
                     get(UserController::getUserByUserId, Roles.ANYONE)
                     delete(UserController::deleteUser, Roles.ANYONE)
@@ -200,7 +192,7 @@ class JavalinConfig() {
                     get(UserController::getUserByEmail, Roles.ANYONE)
                 }
             }
-            path("/api/ui/activities") {
+            path("/test/activities") {
                 get(ActivityController::getAllActivities, Roles.ANYONE)
                 post(ActivityController::addActivity, Roles.ANYONE)
                 path("{activity-id}") {
@@ -209,8 +201,33 @@ class JavalinConfig() {
                     patch(ActivityController::updateActivity, Roles.ANYONE)
                 }
             }
-
-
+            path("/test/categories"){
+                get(CategoryController::getAllCategories, Roles.ANYONE)
+                post(CategoryController::addCategories, Roles.ANYONE)
+                path("{category-id}") {
+                    get(CategoryController::getCategoriesByCategoryId, Roles.ANYONE)
+                    delete(CategoryController::deleteCategoryByCategoryId, Roles.ANYONE)
+                    patch(CategoryController::updateCategoryByCategoryId, Roles.ANYONE)
+                }
+            }
+            path("/test/goals"){
+                get(GoalController::getAllGoals, Roles.ANYONE)
+                post(GoalController::addGoals, Roles.ANYONE)
+                path("{goal-id}") {
+                    get(GoalController::getGoalsByGoalId, Roles.ANYONE)
+                    delete(GoalController::deleteGoalByGoalId, Roles.ANYONE)
+                    patch(GoalController::updateGoalByGoalId, Roles.ANYONE)
+                }
+            }
+            path("/test/profile"){
+                get(ProfileController::getAllUserProfile, Roles.ANYONE)
+                post(ProfileController::addUserProfile, Roles.ANYONE)
+                path("{profile-id}") {
+                    get(ProfileController::getUserProfileByProfileId, Roles.ANYONE)
+                    delete(ProfileController::deleteProfileByProfileId, Roles.ANYONE)
+                    patch(ProfileController::updateProfile, Roles.ANYONE)
+                }
+            }
             }
         }
 

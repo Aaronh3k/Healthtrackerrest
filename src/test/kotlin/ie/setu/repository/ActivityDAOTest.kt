@@ -44,9 +44,9 @@ class ActivityDAOTest {
                 val activityDAO = populateActivityTable()
                 //Act & Assert
                 assertEquals(3, activityDAO.getAll().size)
-                assertEquals(activity1, activity1.id?.let { activityDAO.findByActivityId(it) })
-                assertEquals(activity2, activity2.id?.let { activityDAO.findByActivityId(it) })
-                assertEquals(activity3, activity3.id?.let { activityDAO.findByActivityId(it) })
+                assertEquals(activity1, activity1.id.let { activityDAO.findByActivityId(it) })
+                assertEquals(activity2, activity2.id.let { activityDAO.findByActivityId(it) })
+                assertEquals(activity3, activity3.id.let { activityDAO.findByActivityId(it) })
             }
         }
     }
@@ -145,7 +145,7 @@ class ActivityDAOTest {
 
                 //Act & Assert
                 val activity3updated = Activity(id = 3, description = "Cardio", duration = 42.0,
-                    calories = 220.0, started = DateTime.now(), userId = 2, categoryId = 2, distance = 5.4, created_at = DateTime.now())
+                    calories = 220.0, started = DateTime.now(), userId = 2, categoryId = 2, distance = 5.4, created_at = DateTime.parse("1998-06-11"))
                 activity3updated.id?.let { activityDAO.updateByActivityId(it, activity3updated) }
                 assertEquals(activity3updated, activityDAO.findByActivityId(3))
             }

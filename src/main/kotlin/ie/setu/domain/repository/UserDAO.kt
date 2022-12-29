@@ -32,13 +32,24 @@ class UserDAO {
         }
     }
 
-    fun create(user: User) :  Int? {
+    fun create(user: User) :  Int {
         return transaction {
             Users.insert { row ->
-                row[Users.email] = user.email
-                row[Users.user_name] = user.user_name!!
-                row[Users.password] = user.password!!
-                row[Users.role] = user.role!!
+                row[email] = user.email
+                row[user_name] = user.user_name!!
+                row[password] = user.password!!
+            } get Users.id
+        }
+    }
+
+    fun save(user: User) :  Int {
+        return transaction {
+            Users.insert { row ->
+                row[email] = user.email
+                row[user_name] = user.user_name!!
+                row[password] = user.password!!
+                row[role] = user.role!!
+                row[token] = user.token!!
             } get Users.id
         }
     }
@@ -90,6 +101,8 @@ class UserDAO {
                     Users.id eq id}) {
                     it[user_name] = user.user_name!!
                     it[email] = user.email
+                    it[role] = user.role!!
+                    it[token] = user.token!!
                 }
             }
         }catch (e: Exception){

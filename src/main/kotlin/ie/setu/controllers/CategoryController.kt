@@ -49,7 +49,7 @@ object CategoryController {
             ctx.status(200)
         }
         else{
-            ctx.status(404)
+            ctx.status(204)
         }
     }
 

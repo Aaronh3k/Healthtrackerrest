@@ -2,7 +2,7 @@ package ie.setu.domain
 
 import org.joda.time.DateTime
 
-data class Activity (var id: Int? = null,
+data class Activity (var id: Int,
                      var userId: Int? = null,
                      var categoryId: Int,
                      var description:String,
