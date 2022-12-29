@@ -86,7 +86,7 @@ object CategoryController {
         responses  = [OpenApiResponse("204")]
     )
     fun deleteCategoryByCategoryId(ctx: Context){
-        if (CategoryController.categoryDAO.deleteByCategoryId(ctx.pathParam("category-id").toInt()) != 0)
+        if (categoryDAO.deleteByCategoryId(ctx.pathParam("category-id").toInt()) != 0)
             ctx.status(204)
         else
             ctx.status(404)
