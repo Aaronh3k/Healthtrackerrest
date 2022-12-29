@@ -2,6 +2,7 @@ package ie.setu.controllers
 
 import ie.setu.domain.Activity
 import ie.setu.domain.Profile
+import ie.setu.domain.User
 import ie.setu.domain.repository.ProfileDAO
 import ie.setu.utils.jsonToObject
 import io.javalin.http.Context
@@ -123,13 +124,44 @@ object ProfileController {
         pathParams = [OpenApiParam("profile-id", Int::class, "The profile ID")],
         responses  = [OpenApiResponse("204")]
     )
-    fun updateProfileByProfileId(ctx: Context){
-        val profile : Profile = jsonToObject(ctx.body())
-        if (profileDAO.updateByProfileId(profileId = ctx.pathParam("profile-id").toInt(), profileDTO =profile) != 0)
-            ctx.status(201)
-        else
-            ctx.status(204)
+    fun updateProfile(ctx: Context){
+        val foundprofile : Profile = jsonToObject(ctx.body())
+        var st = 0
+        if (ctx.pathParamMap().get("profile-id") == null) {
+            val email = ctx.attribute<String>("email")
+            val user = email?.let { UserController.userDao.findByEmail(it) }
+            val userprofile = user?.id?.let { profileDAO.findByUserId(it) }
+            if (userprofile != null) {
+                if (userprofile.id?.let {
+                        profileDAO.updateByProfileId(
+                            profileId = it,
+                            profileDTO = foundprofile
+                        )
+                    } != 0) {
+                    ctx.json(mapOf("message" to "UPDATED"))
+                    ctx.status(201)
+                    return
+                } else {
+                    ctx.json(mapOf("message" to "NOT UPDATED"))
+                    ctx.status(204)
+                    return
+                }
+            }
         }
+
+        else{
+            st = profileDAO.updateByProfileId(profileId = ctx.pathParam("profile-id").toInt(), profileDTO = foundprofile)
+
+            if (st != 0){
+                ctx.json(mapOf("message" to "UPDATED"))
+                ctx.status(200)
+                return}
+            else{
+                ctx.json(mapOf("message" to "NOT UPDATED"))
+                ctx.status(400)
+                return}
+        }
+    }
 
     @OpenApi(
         summary = "Get profile by user ID",
@@ -152,9 +184,25 @@ object ProfileController {
             }
         }
         else{
-            ctx.status(404)
+            ctx.status(204)
         }
     }
+
+//    fun updateUserProfileByUserId(ctx: Context) {
+//        if (profileDAO.findByUserId(ctx.pathParam("user-id").toInt()) != null) {
+//            val userprofile = profileDAO.findByUserId(ctx.pathParam("user-id").toInt())
+//            if (userprofile != null) {
+//                if (profileDAO.updateByProfileId(profileId = ctx.pathParam("profile-id").toInt(), profileDTO = userprofile) != 0)
+//                    ctx.status(201)
+//                else
+//                    ctx.status(204)
+//            }
+//        }
+//        else{
+//            ctx.status(204)
+//        }
+//    }
+
     @OpenApi(
         summary = "Delete profile by user ID",
         operationId = "deleteUserProfileByUserId",
@@ -169,5 +217,19 @@ object ProfileController {
             ctx.status(204)
         else
             ctx.status(404)
+    }
+
+    fun getProfileByToken(ctx: Context) {
+        val email = ctx.attribute<String>("email")
+        val user = email?.let { UserController.userDao.findByEmail(it) }
+
+        val userprofile = user?.id?.let { profileDAO.findByUserId(it) }
+        if (userprofile != null) {
+            ctx.json(userprofile)
+            ctx.status(200)
+        }
+        else{
+            ctx.status(204)
+        }
     }
 }

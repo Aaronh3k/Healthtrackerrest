@@ -166,17 +166,10 @@ object ActivityController {
     )
     fun updateActivity(ctx: Context){
         val activity : Activity = jsonToObject(ctx.body())
-        val activities = activityDAO.findByActivityId(ctx.pathParam("activity-id").toInt())
-        if (activities != null) {
-            activity.created_at = activities.created_at
-        }
-        else{
-            ctx.status(404)
-        }
 
         if (activityDAO.updateByActivityId(activityId = ctx.pathParam("activity-id").toInt(), activityDTO =activity) != 0)
-            ctx.status(204)
+            ctx.status(200)
         else
-            ctx.status(404)
+            ctx.status(204)
     }
 }
