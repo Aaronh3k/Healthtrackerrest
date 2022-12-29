@@ -145,18 +145,28 @@ object GoalController {
         responses  = [OpenApiResponse("200", [OpenApiContent(Activity::class)])]
     )
     fun getGoalsByUserId(ctx: Context) {
-        if (GoalController.userDao.findById(ctx.pathParam("user-id").toInt()) != null) {
-            val goals = GoalController.goalDAO.findByUserId(ctx.pathParam("user-id").toInt())
+        if (ctx.pathParamMap().get("user-id") != null) {
+            val goals = goalDAO.findByUserId(ctx.pathParam("user-id").toInt())
             if (goals.isNotEmpty()) {
                 ctx.json(goals)
                 ctx.status(200)
+                return
             }
             else{
-                ctx.status(404)
+                ctx.status(204)
             }
         }
         else{
-            ctx.status(404)
+            val email = ctx.attribute<String>("email")
+            if (email != null) {
+                val goals = userDao.findUserIdByEmail(email)?.id?.let { goalDAO.findByUserId(it) }
+                if (goals != null) {
+                    ctx.json(goals)
+                    ctx.status(200)
+                    return
+                }
+            }
+            ctx.status(204)
         }
     }
 }

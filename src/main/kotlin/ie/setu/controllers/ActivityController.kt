@@ -59,8 +59,13 @@ object ActivityController {
             val email = ctx.attribute<String>("email")
             if (email != null) {
                 val activities = userDao.findUserIdByEmail(email)?.id?.let { activityDAO.findByUserId(it) }
+                if (activities != null) {
+                    ctx.json(activities)
+                    ctx.status(200)
+                    return
+                }
             }
-            ctx.status(200)
+            ctx.status(204)
         }
     }
     @OpenApi(
@@ -75,7 +80,7 @@ object ActivityController {
     fun addActivity(ctx: Context) {
         val activity : Activity = jsonToObject(ctx.body())
         activity.created_at = DateTime.now()
-        val userId = activity.userId?.let { ActivityController.userDao.findById(it) }
+        val userId = activity.userId?.let { userDao.findById(it) }
         if (userId != null) {
             val activityId = activityDAO.save(activity)
             activity.id = activityId
@@ -83,9 +88,10 @@ object ActivityController {
             ctx.status(201)
         }
         else{
-            ctx.status(400)
+            ctx.status(204)
         }
     }
+
 
     fun addActivityByUserId(ctx: Context) {
         val activity : Activity = jsonToObject(ctx.body())
@@ -134,9 +140,9 @@ object ActivityController {
     )
     fun deleteActivityByActivityId(ctx: Context){
         if (activityDAO.deleteByActivityId(ctx.pathParam("activity-id").toInt()) != 0)
-            ctx.status(204)
+            ctx.status(200)
         else
-            ctx.status(404)
+            ctx.status(204)
     }
 
     @OpenApi(
