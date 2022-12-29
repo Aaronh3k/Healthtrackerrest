@@ -151,9 +151,21 @@ class JavalinConfig() {
                 path("{profile-id}") {
                     get(ProfileController::getUserProfileByProfileId, Roles.USER, Roles.ADMIN)
                     delete(ProfileController::deleteProfileByProfileId, Roles.ADMIN)
-                    patch(ProfileController::updateProfileByProfileId, Roles.USER, Roles.ADMIN)
+                    patch(ProfileController::updateProfile, Roles.USER, Roles.ADMIN)
                 }
+            }//getProfileByToken
+            path("/api/user-profile"){
+                get(ProfileController::getProfileByToken, Roles.USER, Roles.ADMIN)
+                patch(ProfileController::updateProfile, Roles.USER, Roles.ADMIN)
+//                post(ProfileController::addUserProfile, Roles.USER, Roles.ADMIN)
+//                path("{profile-id}") {
+//                    get(ProfileController::getUserProfileByProfileId, Roles.USER, Roles.ADMIN)
+//                    delete(ProfileController::deleteProfileByProfileId, Roles.ADMIN)
+//                    patch(ProfileController::updateProfileByProfileId, Roles.USER, Roles.ADMIN)
+//                }
             }
+
+
 
             get("/", VueComponent("<home-page></home-page>"), Roles.ANYONE)
             get("/users", VueComponent("<user-overview></user-overview>"), Roles.ANYONE)
