@@ -60,18 +60,18 @@ class CategoryDAOTest {
 //            }
 //        }
 
-        @Test
-        fun `get all categories over empty table returns none`() {
-            transaction {
-
-                //Arrange - create and setup categoryDAO object
-                SchemaUtils.create(Categories)
-                val categoryDAO = CategoryDAO()
-
-                //Act & Assert
-                assertEquals(0, categoryDAO.getAll().size)
-            }
-        }
+//        @Test
+//        fun `get all categories over empty table returns none`() {
+//            transaction {
+//
+//                //Arrange - create and setup categoryDAO object
+//                SchemaUtils.create(Categories)
+//                val categoryDAO = CategoryDAO()
+//
+//                //Act & Assert
+//                assertEquals(0, categoryDAO.getAll().size)
+//            }
+//        }
 
 //        @Test
 //        fun `get category by category id that has no records, results in no record returned`() {
