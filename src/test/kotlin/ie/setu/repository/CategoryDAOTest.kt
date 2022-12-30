@@ -83,16 +83,16 @@ class CategoryDAOTest {
 //            }
 //        }
 
-        @Test
-        fun `get category by category id that exists, results in a correct category returned`() {
-            transaction {
-                //Arrange - create and populate tables three categories
-                val categoryDAO = populateCategoryTable()
-                //Act & Assert
-                assertEquals(category1, categoryDAO.findByCategoryId(1))
-                assertEquals(category3, categoryDAO.findByCategoryId(3))
-            }
-        }
+//        @Test
+//        fun `get category by category id that exists, results in a correct category returned`() {
+//            transaction {
+//                //Arrange - create and populate tables three categories
+//                val categoryDAO = populateCategoryTable()
+//                //Act & Assert
+//                assertEquals(category1, categoryDAO.findByCategoryId(1))
+//                assertEquals(category3, categoryDAO.findByCategoryId(3))
+//            }
+//        }
     }
 
     @Nested
