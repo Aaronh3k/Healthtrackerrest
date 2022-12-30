@@ -45,7 +45,7 @@ class CategoryDAOTest {
 //                assertEquals(category3, categoryDAO.findByCategoryId(category3.id))
 //            }
 //        }
-//    }
+    }
 
     @Nested
     inner class ReadCategories {
