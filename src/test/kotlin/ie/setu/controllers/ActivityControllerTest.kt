@@ -150,7 +150,7 @@ class ActivityControllerTest {
 
 
         @Test
-        fun `get activity by activity id when activity exists returns 200 response`() {
+        fun `get activity by activity id when activity exists returns 201 response`() {
             //Arrange - add a user and associated activity
             val addedUser : User = jsonToObject(addUser(validUserName, validEmail, validPassword, validToken, validRole).body.toString())
             val addedCategory : Category = jsonToObject(addCategory(category_name, category_description).body.toString())
@@ -174,8 +174,8 @@ class ActivityControllerTest {
             }
 
             //After - delete the added user, category and assert a 204 is returned
-            assertEquals(200, deleteUser(addedUser.id).status)
-            assertEquals(204, deleteCategoryByCategoryId(addedCategory.id).status)
+            deleteUser(addedUser.id)
+            deleteCategoryByCategoryId(addedCategory.id)
         }
 
     }

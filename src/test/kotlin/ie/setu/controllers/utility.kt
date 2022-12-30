@@ -207,18 +207,56 @@ fun addGoal(
 }
 
 //helper function to add a test userprofile to the database
-fun addUserProfile(userId: Int, first_name: String, last_name: String, dob: DateTime, gender: Char,
-                   created_at: DateTime): HttpResponse<JsonNode> {
-    return Unirest.post("$origin/test/userprofile")
+fun addUserProfile(userId: Int, first_name: String, last_name: String, dob: DateTime, gender: Char): HttpResponse<JsonNode> {
+    return Unirest.post("$origin/test/profile")
         .body("""
                 {
                    "first_name":"$first_name",
-                   "last_name":$last_name,
-                   "dob":$dob,
+                   "last_name":"$last_name",
+                   "dob":"$dob",
                    "gender":"$gender",
-                   "userId":$userId,
-                   "created_at":"$created_at"
+                   "userId":$userId
                 }
             """.trimIndent())
         .asJson()
+}
+
+//helper function to retrieve all profile
+fun retrieveAllProfiles(): HttpResponse<JsonNode> {
+    return Unirest.get("$origin/test/profile").asJson()
+}
+
+//helper function to retrieve profile by profile id
+fun retrieveProfileById(id: Int): HttpResponse<JsonNode> {
+    return Unirest.get(origin + "/test/profile/${id}").asJson()
+}
+
+//helper function to retrieve profile by user id
+fun retrieveProfileByUserId(id: Int): HttpResponse<JsonNode> {
+    return Unirest.get(origin + "/test/users/${id}/userprofile").asJson()
+}
+
+//helper function to delete a profile by profile id
+fun deleteProfileByProfileId(id: Int): HttpResponse<String> {
+    return Unirest.delete("$origin/test/profile/$id").asString()
+}
+
+//helper function to delete an profile by user id
+fun deleteProfileByUserId(id: Int): HttpResponse<String> {
+    return Unirest.delete("$origin/test/users/$id/userprofile").asString()
+}
+
+//helper function to update a profile to the database
+fun updateProfile(id: Int, userId: Int, first_name: String, last_name: String, dob: DateTime, gender: Char): HttpResponse<JsonNode> {
+    return Unirest.patch("$origin/test/profile/$id")
+        .body("""
+                {
+                   "userId":$userId,
+                   "first_name":"$first_name",
+                   "last_name":"$last_name",
+                   "dob":"$dob",
+                   "gender":"$gender",
+                   "userId":$userId
+                }
+            """.trimIndent()).asJson()
 }

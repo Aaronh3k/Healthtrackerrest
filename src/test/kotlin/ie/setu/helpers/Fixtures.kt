@@ -26,6 +26,11 @@ const val updatedPassword = "updated password"
 const val updatedToken = "updated tokennnn"
 const val updatedRole = "ROLE_USER"
 
+const val validFirstname = "First Name"
+const val validlastname = "Last Name"
+val validdob = DateTime.parse("2020-06-11T05:59:27.258Z")
+const val validGender = 'M'
+
 const val updatedDescription = "Updated Description"
 const val updatedDuration = 30.0
 const val updatedCalories = 945.0
@@ -67,9 +72,9 @@ val goals = arrayListOf<Goal>(
 )
 
 val userprofile = arrayListOf<Profile>(
-    Profile(id = 1, first_name = "Test", last_name = "test", gender = 'M',  dob = DateTime.parse("1998-06-11"), created_at = DateTime.parse("1998-06-11"), userId = 1),
-    Profile(id = 2, first_name = "Aaron", last_name = "Pinto", gender = 'M',  dob = DateTime.parse("1990-06-11"), created_at = DateTime.parse("1998-06-11"), userId = 3),
-    Profile(id = 3, first_name = "First", last_name = "Name", gender = 'F',  dob = DateTime.parse("1995-06-11"), created_at = DateTime.parse("1998-06-11"), userId = 2),
+    Profile(id = 1, first_name = "Test", last_name = "test", gender = 'M',  dob = DateTime.parse("1998-06-11"), userId = 1, created_at = DateTime.parse("1998-06-11")),
+    Profile(id = 2, first_name = "Aaron", last_name = "Pinto", gender = 'M',  dob = DateTime.parse("1990-06-11"), userId = 3, created_at = DateTime.parse("1998-06-11")),
+    Profile(id = 3, first_name = "First", last_name = "Name", gender = 'F',  dob = DateTime.parse("1995-06-11"), userId = 2, created_at = DateTime.parse("1998-06-11")),
 )
 
 fun populateUserTable(): UserDAO {
