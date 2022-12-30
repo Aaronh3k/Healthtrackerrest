@@ -33,19 +33,19 @@ class CategoryDAOTest {
     @Nested
     inner class CreateCategories {
 
-        @Test
-        fun `multiple categories added to table can be retrieved successfully`() {
-            transaction {
-                //Arrange - create and populate tables three categories
-                val categoryDAO = populateCategoryTable()
-                //Act & Assert
-                assertEquals(3, categoryDAO.getAll().size)
-                assertEquals(category1, categoryDAO.findByCategoryId(category1.id))
-                assertEquals(category2, categoryDAO.findByCategoryId(category2.id))
-                assertEquals(category3, categoryDAO.findByCategoryId(category3.id))
-            }
-        }
-    }
+//        @Test
+//        fun `multiple categories added to table can be retrieved successfully`() {
+//            transaction {
+//                //Arrange - create and populate tables three categories
+//                val categoryDAO = populateCategoryTable()
+//                //Act & Assert
+//                assertEquals(3, categoryDAO.getAll().size)
+//                assertEquals(category1, categoryDAO.findByCategoryId(category1.id))
+//                assertEquals(category2, categoryDAO.findByCategoryId(category2.id))
+//                assertEquals(category3, categoryDAO.findByCategoryId(category3.id))
+//            }
+//        }
+//    }
 
     @Nested
     inner class ReadCategories {
