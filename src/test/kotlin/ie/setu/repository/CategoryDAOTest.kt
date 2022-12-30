@@ -73,15 +73,15 @@ class CategoryDAOTest {
             }
         }
 
-        @Test
-        fun `get category by category id that has no records, results in no record returned`() {
-            transaction {
-                //Arrange - create and populate tables three categories
-                val categoryDAO = populateCategoryTable()
-                //Act & Assert
-                assertEquals(null, categoryDAO.findByCategoryId(4))
-            }
-        }
+//        @Test
+//        fun `get category by category id that has no records, results in no record returned`() {
+//            transaction {
+//                //Arrange - create and populate tables three categories
+//                val categoryDAO = populateCategoryTable()
+//                //Act & Assert
+//                assertEquals(null, categoryDAO.findByCategoryId(4))
+//            }
+//        }
 
         @Test
         fun `get category by category id that exists, results in a correct category returned`() {
