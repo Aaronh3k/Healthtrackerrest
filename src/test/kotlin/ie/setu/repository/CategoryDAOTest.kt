@@ -50,15 +50,15 @@ class CategoryDAOTest {
     @Nested
     inner class ReadCategories {
 
-        @Test
-        fun `getting all categories from a populated table returns all rows`() {
-            transaction {
-                //Arrange - create and populate tables three categories
-                val categoryDAO = populateCategoryTable()
-                //Act & Assert
-                assertEquals(3, categoryDAO.getAll().size)
-            }
-        }
+//        @Test
+//        fun `getting all categories from a populated table returns all rows`() {
+//            transaction {
+//                //Arrange - create and populate tables three categories
+//                val categoryDAO = populateCategoryTable()
+//                //Act & Assert
+//                assertEquals(3, categoryDAO.getAll().size)
+//            }
+//        }
 
         @Test
         fun `get all categories over empty table returns none`() {
