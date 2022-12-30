@@ -58,6 +58,7 @@ class ProfileDAO {
                     it[last_name] = profileDTO.last_name!!
                     it[dob] = profileDTO.dob!!
                     it[gender] = profileDTO.gender!!
+                    it[userId] = profileDTO.userId
                 }
             }
         }catch (e: Exception){

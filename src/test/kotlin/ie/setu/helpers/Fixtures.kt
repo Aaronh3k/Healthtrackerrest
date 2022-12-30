@@ -17,8 +17,14 @@ import org.joda.time.DateTime
 const val nonExistingEmail = "112233445566778testUser@xxxxx.xx"
 const val validUserName = "Test User 1"
 const val validEmail = "testuser1@test.com"
+const val validPassword = "password"
+const val validToken = "tokennnn"
+const val validRole = "ROLE_USER"
 const val updatedUserName = "Updated Name"
 const val updatedEmail = "Updated Email"
+const val updatedPassword = "updated password"
+const val updatedToken = "updated tokennnn"
+const val updatedRole = "ROLE_USER"
 
 const val updatedDescription = "Updated Description"
 const val updatedDuration = 30.0
@@ -30,16 +36,16 @@ const val category_name = "Indoor"
 const val category_description = "Indoor Desc"
 val updateCreatedAt: DateTime = DateTime.now()
 
-val goal_standing_hours = 5.0
-val goal_steps = 2100
-val goal_calories = 500
-val goal_distance = 7
+const val goal_standing_hours = 5.0
+const val goal_steps = 2100
+const val goal_calories = 500
+const val goal_distance = 7
 
 val users = arrayListOf<User>(
-    User(user_name = "alice_wonderland", email = "alice@wonderland.com", id = 1),
-    User(user_name = "bob_cat", email = "bob@cat.ie", id = 2),
-    User(user_name = "mary_contrary", email = "mary@contrary.com", id = 3),
-    User(user_name = "carol_singer", email = "carol@singer.com", id = 4)
+    User(user_name = "alice_wonderland", email = "alice@wonderland.com", id = 1, password = "password1", role = "ROLE_USER", token = "token"),
+    User(user_name = "bob_cat", email = "bob@cat.ie", id = 2, password = "password1", role = "ROLE_USER", token = "token"),
+    User(user_name = "mary_contrary", email = "mary@contrary.com", id = 3,  password = "password1", role = "ROLE_USER", token = "token"),
+    User(user_name = "carol_singer", email = "carol@singer.com", id = 4, password = "password1", role = "ROLE_USER", token = "token")
 )
 
 val categories = arrayListOf<Category>(
@@ -49,9 +55,9 @@ val categories = arrayListOf<Category>(
 )
 
 val activities = arrayListOf<Activity>(
-    Activity(id = 1, description = "Running", duration = 22.0, calories = 230.0, started = DateTime.now(), userId = 1, categoryId = 2, distance = 3.5, created_at = DateTime.now()),
-    Activity(id = 2, description = "Hopping", duration = 10.5, calories = 80.0, started = DateTime.now(), userId = 3, categoryId = 1, distance = 5.5, created_at = DateTime.now()),
-    Activity(id = 3, description = "Walking", duration = 12.0, calories = 120.0, started = DateTime.now(), userId = 2, categoryId = 3, distance = 6.5, created_at = DateTime.now())
+    Activity(id = 1, description = "Running", duration = 22.0, calories = 230.0, started = DateTime.now(), userId = 1, categoryId = 2, distance = 3.5, created_at = DateTime.parse("1998-06-11")),
+    Activity(id = 2, description = "Hopping", duration = 10.5, calories = 80.0, started = DateTime.now(), userId = 3, categoryId = 1, distance = 5.5, created_at = DateTime.parse("1998-06-11")),
+    Activity(id = 3, description = "Walking", duration = 12.0, calories = 120.0, started = DateTime.now(), userId = 2, categoryId = 3, distance = 6.5, created_at = DateTime.parse("1998-06-11"))
 )
 
 val goals = arrayListOf<Goal>(
@@ -61,17 +67,17 @@ val goals = arrayListOf<Goal>(
 )
 
 val userprofile = arrayListOf<Profile>(
-    Profile(id = 1, first_name = "Test", last_name = "test", gender = 'M',  dob = DateTime.parse("1998-06-11"), created_at = DateTime.now(), userId = 1),
-    Profile(id = 2, first_name = "Aaron", last_name = "Pinto", gender = 'M',  dob = DateTime.parse("1990-06-11"), created_at = DateTime.now(), userId = 3),
-    Profile(id = 3, first_name = "First", last_name = "Name", gender = 'F',  dob = DateTime.parse("1995-06-11"), created_at = DateTime.now(), userId = 2),
+    Profile(id = 1, first_name = "Test", last_name = "test", gender = 'M',  dob = DateTime.parse("1998-06-11"), created_at = DateTime.parse("1998-06-11"), userId = 1),
+    Profile(id = 2, first_name = "Aaron", last_name = "Pinto", gender = 'M',  dob = DateTime.parse("1990-06-11"), created_at = DateTime.parse("1998-06-11"), userId = 3),
+    Profile(id = 3, first_name = "First", last_name = "Name", gender = 'F',  dob = DateTime.parse("1995-06-11"), created_at = DateTime.parse("1998-06-11"), userId = 2),
 )
 
 fun populateUserTable(): UserDAO {
     SchemaUtils.create(Users)
     val userDAO = UserDAO()
-    userDAO.create(users[0])
-    userDAO.create(users[1])
-    userDAO.create(users[2])
+    userDAO.save(users[0])
+    userDAO.save(users[1])
+    userDAO.save(users[2])
     return userDAO
 }
 fun populateActivityTable(): ActivityDAO {

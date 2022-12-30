@@ -3,7 +3,7 @@ package ie.setu.domain
 import org.joda.time.DateTime
 
 data class Goal(
-    var id: Int? = null,
+    var id: Int,
     var userId: Int,
     var calories: Int,
     var standing_hours: Double,
