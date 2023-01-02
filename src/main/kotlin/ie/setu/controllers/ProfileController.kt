@@ -66,7 +66,12 @@ object ProfileController {
         responses  = [OpenApiResponse("200")]
     )
     fun addUserProfile(ctx: Context) {
+        val email = ctx.attribute<String>("email")
+        val fuser = email?.let { UserController.userDao.findByEmail(it) }
         val userprofile : Profile = jsonToObject(ctx.body())
+        if (fuser != null) {
+            userprofile.userId = fuser.id
+        }
         userprofile.created_at = DateTime.now()
         val user = UserController.userDao.findById(userprofile.userId)
         if (user == null)
