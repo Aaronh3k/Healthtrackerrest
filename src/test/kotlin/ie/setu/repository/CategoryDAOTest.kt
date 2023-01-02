@@ -59,7 +59,6 @@
 //                assertEquals(3, categoryDAO.getAll().size)
 //            }
 //        }
-//
 //        @Test
 //        fun `get all categories over empty table returns none`() {
 //            transaction {
@@ -72,7 +71,6 @@
 //                assertEquals(0, categoryDAO.getAll().size)
 //            }
 //        }
-//
 //        @Test
 //        fun `get category by category id that has no records, results in no record returned`() {
 //            transaction {

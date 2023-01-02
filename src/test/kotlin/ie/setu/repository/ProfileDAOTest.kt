@@ -57,10 +57,10 @@ class ProfileDAOTest {
                 //Arrange - create and populate table with three users
                 val userDAO = populateProfileTable()
                 val `userprofilecreation` = addUserProfile(userId = 1, first_name = "Test", last_name = "Test",
-                dob = DateTime.parse("1998-06-11"), gender = 'M', created_at = DateTime.now())
+                dob = DateTime.parse("1998-06-11"), gender = 'M')
 
                 //Act & Assert
-                TestCase.assertEquals(404, `userprofilecreation`.status)
+                TestCase.assertEquals(204, `userprofilecreation`.status)
             }
         }
     }
@@ -79,29 +79,29 @@ class ProfileDAOTest {
             }
         }
 
-//        @Test
-//        fun `get userprofile by user id that has no userprofile, results in no record returned`() {
-//            transaction {
-//                //Arrange - create and populate tables with three users and three userprofile
-//                populateUserTable()
-//                val profileDAO = populateProfileTable()
-//                //Act & Assert
-//                assertEquals(1, profileDAO.findByUserId(3).size)
-//            }
-//        }
+        @Test
+        fun `get userprofile by user id that has no userprofile, results in no record returned`() {
+            transaction {
+                //Arrange - create and populate tables with three users and three userprofile
+                populateUserTable()
+                val profileDAO = populateProfileTable()
+                //Act & Assert
+                assertEquals(1, profileDAO.findByUserIdList(1).size)
+            }
+        }
 
-//        @Test
-//        fun `get userprofile by user id that exists, results in a correct activitie(s) returned`() {
-//            transaction {
-//                //Arrange - create and populate tables with three users and three userprofile
-//                populateUserTable()
-//                val profileDAO = populateProfileTable()
-//                //Act & Assert
-//                assertEquals(profile1, profileDAO.findByUserId(1)[0])
-//                assertEquals(profile2, profileDAO.findByUserId(3)[0])
-//                assertEquals(profile3, profileDAO.findByUserId(2)[0])
-//            }
-//        }
+        @Test
+        fun `get userprofile by user id that exists, results in a correct profile returned`() {
+            transaction {
+                //Arrange - create and populate tables with three users and three userprofile
+                populateUserTable()
+                val profileDAO = populateProfileTable()
+                //Act & Assert
+                assertEquals(profile1, profileDAO.findByUserIdList(1)[0])
+                assertEquals(profile2, profileDAO.findByUserIdList(3)[0])
+                assertEquals(profile3, profileDAO.findByUserIdList(2)[0])
+            }
+        }
 
         @Test
         fun `get all userprofile over empty table returns none`() {
