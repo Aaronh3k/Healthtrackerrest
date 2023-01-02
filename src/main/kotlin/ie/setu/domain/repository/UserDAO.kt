@@ -38,6 +38,7 @@ class UserDAO {
                 row[email] = user.email
                 row[user_name] = user.user_name!!
                 row[password] = user.password!!
+                row[role] = user.role!!
             } get Users.id
         }
     }

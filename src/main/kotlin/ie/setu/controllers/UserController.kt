@@ -88,7 +88,9 @@ object UserController {
         if (user.email.contains("admin") ){
             user.role = "ROLE_ADMIN"
         }
-        else user.role = "ROLE_USER"
+        else {
+            user.role = "ROLE_USER"
+        }
         val userId = userDao.create(user.copy(password = String(base64Encoder.encode(Cipher.encrypt(user.password)))))
         if (userId != null && userId != 0) {
             val response = mapOf("message" to "User Registered")
