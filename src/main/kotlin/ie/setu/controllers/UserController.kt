@@ -199,7 +199,7 @@ object UserController {
                 st = userDao.updatebyemail(Email = email, user=foundUser)
             }
             else
-                st = userDao.update(id = ctx.pathParam("user-id").toInt(), user=foundUser)
+                st = userDao.updateU(id = ctx.pathParam("user-id").toInt(), user=foundUser)
 
         if (st != 0){
             ctx.json(mapOf("message" to "UPDATED"))

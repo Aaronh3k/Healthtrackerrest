@@ -111,6 +111,20 @@ class UserDAO {
         }
     }
 
+    fun updateU(id: Int, user: User): Int{
+        return try{
+            transaction {
+                Users.update ({
+                    Users.id eq id}) {
+                    it[user_name] = user.user_name!!
+                    it[email] = user.email
+                }
+            }
+        }catch (e: Exception){
+            0
+        }
+    }
+
     fun updatebyemail(Email: String, user: User): Int{
         return try{
             transaction {
