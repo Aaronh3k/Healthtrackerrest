@@ -19,8 +19,8 @@ The application was built with:
   - [Jackson](https://github.com/FasterXML/jackson-module-kotlin) as data bind serialization/deserialization
   - [H2](https://github.com/h2database/h2database) as database for integration tests
   - [Exposed](https://github.com/JetBrains/Exposed) as Sql framework to persistence layer
-  - [Heroku](https://www.heroku.com/) to deploy, monitor and automatically scale the app
-  - [PostgreSQL](https://www.postgresql.org/) as database
+  - [Railway](https://railway.app/) to deploy, monitor and automatically scale the app
+  - [PostgreSQL](https://www.postgresql.org/) as database in ElephantSQL
 
 Tests:
 
@@ -34,10 +34,6 @@ You need just JVM installed.
 
 The server is configured to start on [7000](http://localhost:7000/api) with `api` context.
 
-# Domain - Heroku
+# Domain - Railway
 
-https://health-tracker-20100312.herokuapp.com/
-
-# Swagger UI
-
-https://health-tracker-20100312.herokuapp.com/swagger-ui
+https://healthtrackerrest-production-cb60.up.railway.app/
